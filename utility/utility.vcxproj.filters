@@ -1,0 +1,49 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="platform">
+      <UniqueIdentifier>{18aa1cf6-9e91-4d54-8c23-2b929f18a68b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="platform\windows">
+      <UniqueIdentifier>{5a513cfe-f59f-4c23-a208-5ad5cf994e88}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="crash_handler.cpp" />
+    <ClCompile Include="console.cpp" />
+    <ClCompile Include="precompiled.cpp" />
+    <ClCompile Include="processor_info.cpp" />
+    <ClCompile Include="setting.cpp" />
+    <ClCompile Include="socket_watch.cpp" />
+    <ClCompile Include="scheduler.cpp" />
+    <ClCompile Include="platform\windows\windows_console.cpp">
+      <Filter>platform\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="callback_registrar.inl" />
+    <ClCompile Include="platform\windows\windows_service.cpp">
+      <Filter>platform\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="args.cpp" />
+    <ClCompile Include="database.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="scheduler.h" />
+    <ClInclude Include="crash_handler.h" />
+    <ClInclude Include="console.h" />
+    <ClInclude Include="precompiled.h" />
+    <ClInclude Include="processor_info.h" />
+    <ClInclude Include="setting.h" />
+    <ClInclude Include="socket_watch.h" />
+    <ClInclude Include="platform\console.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="callback_registrar.h" />
+    <ClInclude Include="service.h" />
+    <ClInclude Include="args.h" />
+    <ClInclude Include="database.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="setting.inl" />
+    <None Include="database.inl" />
+  </ItemGroup>
+</Project>

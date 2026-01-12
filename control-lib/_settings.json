@@ -1,0 +1,13 @@
+{
+  // this is a test comment
+  "Network": {
+    "Interface": {
+      "interfaceAddress": "127.0.0.1",
+      "isUp": false,
+      "isPointToPoint": false,
+      "isLoopback": true,
+      "canBroadcast": false,
+      "canMulticast": false
+    }
+  }
+}

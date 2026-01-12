@@ -1,0 +1,76 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="platform">
+      <UniqueIdentifier>{0823e5ce-c523-4d30-a2fd-231988d7d2ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="platform\windows">
+      <UniqueIdentifier>{9f39faa7-dabc-4388-a32b-63e6a4e2fb88}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="platform\windows\windows_debug.cpp">
+      <Filter>platform\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="platform\windows\windows_file.cpp">
+      <Filter>platform\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="file.cpp" />
+    <ClCompile Include="hash.cpp" />
+    <ClCompile Include="memory.cpp" />
+    <ClCompile Include="precompiled.cpp" />
+    <ClCompile Include="socket.cpp" />
+    <ClCompile Include="stdio.cpp" />
+    <ClCompile Include="string.cpp" />
+    <ClCompile Include="time.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="platform\windows.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="platform\winsock.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="platform\platform_file.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="algorithm.h" />
+    <ClInclude Include="assert.h" />
+    <ClInclude Include="atomic.h" />
+    <ClInclude Include="bit.h" />
+    <ClInclude Include="buildmsg.h" />
+    <ClInclude Include="chrono.h" />
+    <ClInclude Include="compiler.h" />
+    <ClInclude Include="concurrency.h" />
+    <ClInclude Include="debug.h" />
+    <ClInclude Include="file.h" />
+    <ClInclude Include="format.h" />
+    <ClInclude Include="hash.h" />
+    <ClInclude Include="initializer_list.h" />
+    <ClInclude Include="intrin.h" />
+    <ClInclude Include="math.h" />
+    <ClInclude Include="memory.h" />
+    <ClInclude Include="mutex.h" />
+    <ClInclude Include="platform.h" />
+    <ClInclude Include="precompiled.h" />
+    <ClInclude Include="semaphore.h" />
+    <ClInclude Include="socket.h" />
+    <ClInclude Include="stdarg.h" />
+    <ClInclude Include="stdio.h" />
+    <ClInclude Include="stdlib.h" />
+    <ClInclude Include="string.h" />
+    <ClInclude Include="thread.h" />
+    <ClInclude Include="time.h" />
+    <ClInclude Include="type_traits.h" />
+    <ClInclude Include="types.h" />
+    <ClInclude Include="utility.h" />
+    <ClInclude Include="variant.h" />
+    <ClInclude Include="linear_allocator.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="hash.inl" />
+    <None Include="time.inl" />
+    <None Include="variant.inl" />
+    <None Include="memory.inl" />
+  </ItemGroup>
+</Project>

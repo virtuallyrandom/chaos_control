@@ -1,0 +1,143 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="avltree.h" />
+    <ClInclude Include="gui.h" />
+    <ClInclude Include="image.h" />
+    <ClInclude Include="jsmn.h" />
+    <ClInclude Include="list.h" />
+    <ClInclude Include="mem_alloc.h" />
+    <ClInclude Include="precompiled.h" />
+    <ClInclude Include="ring.h" />
+    <ClInclude Include="stringTable.h" />
+    <ClInclude Include="thread.h" />
+    <ClInclude Include="dataSource\dataSourceFile.h">
+      <Filter>dataSource</Filter>
+    </ClInclude>
+    <ClInclude Include="dataSource\dataSourceTcp.h">
+      <Filter>dataSource</Filter>
+    </ClInclude>
+    <ClInclude Include="dataSource\dataSource.h">
+      <Filter>dataSource</Filter>
+    </ClInclude>
+    <ClInclude Include="listener\listener.h">
+      <Filter>listener</Filter>
+    </ClInclude>
+    <ClInclude Include="plugins\plugin.h">
+      <Filter>plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="listener\listenerBroadcastTcpIp.h">
+      <Filter>listener</Filter>
+    </ClInclude>
+    <ClInclude Include="listener\listenerDirectTcpIp.h">
+      <Filter>listener</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\imconfig.h">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\imgui.h">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\imgui_internal.h">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\imstb_rectpack.h">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\imstb_textedit.h">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\imstb_truetype.h">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="plugins\example.h">
+      <Filter>plugins</Filter>
+    </ClInclude>
+    <ClInclude Include="connection.h" />
+    <ClInclude Include="gui\imgui_impl_opengl3.h">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\imgui_impl_win32.h">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\imgui_impl_opengl3_loader.h">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\imgui_impl_opengl2.h">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="gui\imgui_impl_glfw.h">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="target.h" />
+    <ClInclude Include="socket.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="jsmn.c" />
+    <ClCompile Include="list.c" />
+    <ClCompile Include="mem_alloc.c" />
+    <ClCompile Include="precompiled_cee.c" />
+    <ClCompile Include="precompiled_cpp.cpp" />
+    <ClCompile Include="ring.c" />
+    <ClCompile Include="stringTable.c" />
+    <ClCompile Include="thread.c" />
+    <ClCompile Include="avltree.c" />
+    <ClCompile Include="dataSource\dataSourceFile.c">
+      <Filter>dataSource</Filter>
+    </ClCompile>
+    <ClCompile Include="dataSource\dataSourceTcp.c">
+      <Filter>dataSource</Filter>
+    </ClCompile>
+    <ClCompile Include="listener\listenerBroadcastTcpIp.c">
+      <Filter>listener</Filter>
+    </ClCompile>
+    <ClCompile Include="listener\listenerDirectTcpIp.c">
+      <Filter>listener</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\imgui.cpp">
+      <Filter>gui</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\imgui_draw.cpp">
+      <Filter>gui</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\imgui_widgets.cpp">
+      <Filter>gui</Filter>
+    </ClCompile>
+    <ClCompile Include="gui.cpp" />
+    <ClCompile Include="plugins\example.cpp">
+      <Filter>plugins</Filter>
+    </ClCompile>
+    <ClCompile Include="connection.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="gui\imgui_impl_opengl3.cpp">
+      <Filter>gui</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\imgui_impl_win32.cpp">
+      <Filter>gui</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\imgui_tables.cpp">
+      <Filter>gui</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\imgui_impl_opengl2.cpp">
+      <Filter>gui</Filter>
+    </ClCompile>
+    <ClCompile Include="gui\imgui_impl_glfw.cpp">
+      <Filter>gui</Filter>
+    </ClCompile>
+    <ClCompile Include="target.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="dataSource">
+      <UniqueIdentifier>{1a1b3ca8-87f1-4182-85a4-6302699fc506}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="listener">
+      <UniqueIdentifier>{4a3286b8-204e-4c48-9d60-61f7ef5cebf3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="plugins">
+      <UniqueIdentifier>{eb246043-8181-4581-9989-d9f3aeded900}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gui">
+      <UniqueIdentifier>{96ab4c94-c3fd-40a9-a236-00a2d6b8bce5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
