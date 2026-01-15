@@ -14,12 +14,6 @@ public:
         try
         {
             {
-                cc::setting stg("name", "value");
-                const cc::string& value = stg["name"];
-                printf("%s\n", value.c_str());
-            }
-
-            {
                 cc::setting stg;
                 stg["one"] = "wan";
                 stg["two"] = "too";
@@ -47,4 +41,4 @@ public:
     {
         return "variant";
     }
-} variantTest;
+} variant_test;

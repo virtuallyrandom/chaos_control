@@ -4,10 +4,10 @@
 #include <containers/unordered_map.h>
 #include <containers/vector.h>
 
-class variantTest : public cc::test
+class variant_test : public cc::test
 {
 public:
-    variantTest() = default;
+    variant_test() = default;
 
     virtual cc::string operator()() override
     {
@@ -17,11 +17,7 @@ public:
         {
             using vec_type = cc::vector<uint16_t>;
             using map_type = cc::unordered_map<uint64_t, uint64_t>;
-            cc::variant<int, cc::string, vec_type, map_type> var;
-
-            var = 1;
-//            var = "this is a string";
-            //            var[1] = cc::variant{ "test" };
+            cc::variant<int, cc::string, vec_type, map_type> var("this is a string");
 
             cc::string to = var;
 
@@ -44,4 +40,4 @@ public:
     {
         return "variant";
     }
-} variantTest;
+} variant_test;

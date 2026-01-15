@@ -23,6 +23,10 @@
     <ClCompile Include="stdio.cpp" />
     <ClCompile Include="string.cpp" />
     <ClCompile Include="time.cpp" />
+    <ClCompile Include="platform\windows\windows_memory.cpp">
+      <Filter>platform\windows</Filter>
+    </ClCompile>
+    <ClCompile Include="allocator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="platform\windows.h">
@@ -66,11 +70,16 @@
     <ClInclude Include="utility.h" />
     <ClInclude Include="variant.h" />
     <ClInclude Include="linear_allocator.h" />
+    <ClInclude Include="platform\platform_memory.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="allocator.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="hash.inl" />
     <None Include="time.inl" />
     <None Include="variant.inl" />
     <None Include="memory.inl" />
+    <None Include="allocator.inl" />
   </ItemGroup>
 </Project>

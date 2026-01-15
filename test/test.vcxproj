@@ -141,6 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="allocator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="setting.cpp" />
     <ClCompile Include="test.cpp" />

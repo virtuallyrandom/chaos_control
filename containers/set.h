@@ -7,9 +7,9 @@
 namespace cc
 {
     template <typename Type>
-    class passthrough_allocator;
+    class object_allocator;
 
-    template <class Key, class CmpPred=std::less<Key>, class Alloc=cc::passthrough_allocator<Key>>
+    template <class Key, class CmpPred=std::less<Key>, class Alloc=cc::object_allocator<Key>>
     class set : public std::set<Key, CmpPred, Alloc>
     {
     public:
