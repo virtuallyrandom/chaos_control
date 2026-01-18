@@ -5,15 +5,10 @@ namespace cc
 {
     inline void* allocator::reallocate(void* const ptr, size_t const size, align_val_t const align) noexcept
     {
-        if (0 == size && nullptr != ptr)
+        if (nullptr != ptr)
             m_frees++;
-        else if (nullptr == ptr)
-        {
-            if (0 != size)
-                m_allocs++;
-            else
-                return nullptr;
-        }
+        if (0 != size)
+            m_allocs++;
 
         return internal_reallocate(ptr, size, align);
     }

@@ -66,7 +66,7 @@ public:
         {
             linear_allocator la;
 
-            check_alloc_count(la, 1, 0, error);
+            check_alloc_count(la, 0, 0, error);
 
             void* p;
             p = la.allocate(1);
@@ -92,6 +92,10 @@ public:
 
             // realloc to free this one and make a new one (note la doesn't actually free)
             p = la.reallocate(p, 8, alignof(uint32_t));
+            check_alloc_count(la, 4, 3, error);
+
+            p = la.reallocate(p, 0);
+            check_alloc_count(la, 4, 4, error);
         }
         catch (...)
         {
