@@ -80,14 +80,14 @@ namespace cc::socket
     }
 
     // helper functions
-    socket_type TCPListen(const uint16_t port, const network_interface* optionalInterface = nullptr);
+    socket_type TCPListen(const uint16_t port, const network_interface* optional_interface = nullptr);
     socket_type TCPConnect(const char* const address, const uint16_t port);
 
     using sockaddr = struct ::sockaddr;
 
     socket_type socket(Domain, Type, Protocol);
 
-    size_t select(socket_type* read, size_t readCount, socket_type* write, size_t writeCount, socket_type* error, size_t errorCount, microseconds);
+    size_t select(socket_type* read, size_t read_count, socket_type* write, size_t write_count, socket_type* error, size_t error_count, microseconds);
 
     size_t select(socket_type read = kInvalidSocket, socket_type write = kInvalidSocket, socket_type error = kInvalidSocket, microseconds const timeout = microseconds{ 0 });
 
@@ -97,7 +97,7 @@ namespace cc::socket
         return select(read, ReadCount, write, WriteCount, error, ErrorCount, timeout);
     }
 
-    socket_type accept(socket_type sck, sockaddr* addr, int* addrLen);
+    socket_type accept(socket_type sck, sockaddr* addr, int* addr_len);
 
     int ioctl(socket_type, uint32_t cmd, uint32_t* argp);
     void shutdown(socket_type, Direction);
@@ -113,8 +113,8 @@ namespace cc::socket
     // these are different from the standard in that they'll continue to
     // send or recv when it would otherwise bail due to internal buffers
     // being full.
-    int recvAll(socket_type, void* const, const size_t size, const int flags);
-    int sendAll(socket_type, const void* const, const size_t size, const int flags);
+    int recv_all(socket_type, void* const, const size_t size, const int flags);
+    int send_all(socket_type, const void* const, const size_t size, const int flags);
 
     int recv(socket_type, void* const, const size_t size, const int flags);
     int send(socket_type, const void* const, const size_t size, const int flags);

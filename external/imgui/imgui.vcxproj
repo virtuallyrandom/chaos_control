@@ -153,6 +153,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <DisableSpecificWarnings>4514;4464;4598;5045</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -174,6 +175,7 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
+      <DisableSpecificWarnings>4514;4464;4598;5045</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>

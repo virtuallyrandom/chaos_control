@@ -97,7 +97,7 @@ namespace cc
     {
         close();
 
-        char const* modeValue[] =
+        char const* mode_value[] =
         {
             nullptr, // kInvalid,
             "r",     // kRead,
@@ -105,35 +105,35 @@ namespace cc
             "w+",    // kAppend,
         };
 
-        char const* typeValue[] =
+        char const* type_value[] =
         {
             nullptr, // kInvalid,
             "t", // kText,
             "b", // kBinary,
         };
 
-        size_t const modeIndex = static_cast<size_t>(mode);
-        assert(modeIndex < countof(modeValue) && modeValue[modeIndex] != nullptr);
+        size_t const mode_index = static_cast<size_t>(mode);
+        assert(mode_index < countof(mode_value) && mode_value[mode_index] != nullptr);
 
-        size_t const typeIndex = static_cast<size_t>(type);
-        assert(typeIndex < countof(typeValue) && typeValue[typeIndex] != nullptr);
+        size_t const type_index = static_cast<size_t>(type);
+        assert(type_index < countof(type_value) && type_value[type_index] != nullptr);
 
-        char modeStr[4]{};
+        char mode_str[4]{};
 
-        strcat_s(modeStr, modeValue[modeIndex]);
-        strcat_s(modeStr, typeValue[typeIndex]);
-        modeStr[sizeof(modeStr) - 1] = 0;
+        strcat_s(mode_str, mode_value[mode_index]);
+        strcat_s(mode_str, type_value[type_index]);
+        mode_str[sizeof(mode_str) - 1] = 0;
 
         FILE* fp = nullptr;
-        errno_t const err = fopen_s(&fp, path, modeStr);
+        errno_t const err = fopen_s(&fp, path, mode_str);
         if (err != 0 || fp == nullptr)
             return false;
 
         m_platform = fp;
 
-        size_t const pathSize = strlen(path) + 1;
-        m_path = new char[pathSize];
-        strcpy_s(m_path, pathSize, path);
+        size_t const path_size = strlen(path) + 1;
+        m_path = new char[path_size];
+        strcpy_s(m_path, path_size, path);
 
         m_mode = mode;
         m_type = type;
@@ -164,10 +164,10 @@ namespace cc
             return 0;
 
         FILE* const fp = reinterpret_cast<FILE*>(m_platform);
-        ssize_t const originalPos = _ftelli64(fp);
+        ssize_t const original_pos = _ftelli64(fp);
         _fseeki64(fp, 0, SEEK_END);
         ssize_t const length = _ftelli64(fp);
-        _fseeki64(fp, originalPos, SEEK_SET);
+        _fseeki64(fp, original_pos, SEEK_SET);
         return truncate_cast<size_t>(length);
     }
 
@@ -192,10 +192,10 @@ namespace cc
             SEEK_END, // kEnd,
         };
 
-        size_t const posIndex = static_cast<size_t>(pos);
-        assert(posIndex < countof(origins) && pos != file_pos::kInvalid);
+        size_t const pos_index = static_cast<size_t>(pos);
+        assert(pos_index < countof(origins) && pos != file_pos::kInvalid);
 
-        int const rv = _fseeki64(fp, offset, origins[posIndex]);
+        int const rv = _fseeki64(fp, offset, origins[pos_index]);
         if (rv != 0)
         {
             assert(rv == 0);
@@ -221,25 +221,25 @@ namespace cc
             fflush(reinterpret_cast<FILE*>(m_platform));
     }
 
-    size_t file::read(void* const buffer, size_t const bufferSize)
+    size_t file::read(void* const buffer, size_t const buffer_size)
     {
         if (m_platform == nullptr)
             return 0;
 
         FILE* const fp = reinterpret_cast<FILE*>(m_platform);
-        size_t const len = fread(buffer, 1, bufferSize, fp);
-        if (m_type == file_type::kText && len < bufferSize)
+        size_t const len = fread(buffer, 1, buffer_size, fp);
+        if (m_type == file_type::kText && len < buffer_size)
             reinterpret_cast<byte*>(buffer)[len] = byte(0);
         return len;
     }
 
-    size_t file::write(void const* const buffer, size_t const bufferSize)
+    size_t file::write(void const* const buffer, size_t const buffer_size)
     {
         if (m_platform == nullptr)
             return 0;
 
         FILE* const fp = reinterpret_cast<FILE*>(m_platform);
-        return fwrite(buffer, 1, bufferSize, fp);
+        return fwrite(buffer, 1, buffer_size, fp);
     }
 
     bool read_file(char const* const path, string& buffer)
@@ -249,15 +249,14 @@ namespace cc
         if (!f)
             return false;
 
-        size_t const fileSize = f.size();
+        size_t const file_size = f.size();
 
-        buffer.resize(fileSize + 1);
-        size_t const actualLength = f.read(buffer.data(), fileSize + 1);
-        buffer.resize(actualLength);
+        buffer.resize(file_size + 1);
+        size_t const actual_length = f.read(buffer.data(), file_size + 1);
+        buffer.resize(actual_length);
 
         f.close();
 
         return true;
     }
-
 } // namespace cc

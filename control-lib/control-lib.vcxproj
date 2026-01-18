@@ -98,7 +98,7 @@
       <TreatWarningAsError>false</TreatWarningAsError>
       <AdditionalIncludeDirectories>$(ProjectDir)/lib/lua-5.3.3/src;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>$(CmdlineOptions) %(AdditionalOptions)</AdditionalOptions>
-      <DisableSpecificWarnings>4464;4598;5045</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4514;4464;4598;5045</DisableSpecificWarnings>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <ForcedIncludeFiles>$(ProjectDir)precompiled.h</ForcedIncludeFiles>
@@ -124,7 +124,7 @@
       <TreatWarningAsError>false</TreatWarningAsError>
       <AdditionalIncludeDirectories>$(ProjectDir)/lib/lua-5.3.3/src;;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>$(CmdlineOptions) %(AdditionalOptions)</AdditionalOptions>
-      <DisableSpecificWarnings>4464;4598;5045</DisableSpecificWarnings>
+      <DisableSpecificWarnings>4514;4464;4598;5045</DisableSpecificWarnings>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <ForcedIncludeFiles>$(ProjectDir)precompiled.h</ForcedIncludeFiles>

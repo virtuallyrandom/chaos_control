@@ -5,7 +5,7 @@ namespace cc
 {
     inline void* allocator::reallocate(void* const ptr, size_t const size, align_val_t const align) noexcept
     {
-        if (0 == size)
+        if (0 == size && nullptr != ptr)
             m_frees++;
         else if (nullptr == ptr)
         {
@@ -15,16 +15,16 @@ namespace cc
                 return nullptr;
         }
 
-        return internal_reallocate(nullptr, size, align);
+        return internal_reallocate(ptr, size, align);
     }
 
-    inline void* allocator::allocate(size_t const size, align_val_t const alignVal) noexcept
+    inline void* allocator::allocate(size_t const size, align_val_t const align_val) noexcept
     {
         static constexpr align_val_t kDefaultAlignment{ 8 };
         static constexpr align_val_t kZeroAlignment{};
 
-        align_val_t const align = alignVal == kZeroAlignment ? kDefaultAlignment : alignVal;
-        assert((static_cast<size_t>(align) & (static_cast<size_t>(align) - 1)) == 0); // not a power of two
+        align_val_t const align = align_val == kZeroAlignment ? kDefaultAlignment : align_val;
+        assert((align & (align - 1)) == 0); // not a power of two
 
         void* const result = internal_reallocate(nullptr, size, align);
 

@@ -11,9 +11,9 @@ namespace cc
 
     using std::shared_timed_mutex;
 
-    // unique_lock<shared_timed_mutex> scopeLock(my_shared_timed_mutex);
+    // unique_lock<shared_timed_mutex> lock(my_shared_timed_mutex);
     using std::unique_lock;
 
-    // shared_lock<shared_timed_mutex> scopeLock(my_shared_timed_mutex);
+    // shared_lock<shared_timed_mutex> lock(my_shared_timed_mutex);
     using std::shared_lock;
 } // namespace shared

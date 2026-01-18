@@ -1,0 +1,19 @@
+lowercase separated by underscores
+
+constants are kCamelCase
+
+to find camelCase (VS), do case sensitive search for: \s(?!k)[A-Z]*[a-z]+[A-Z]+
+
+template types are simple leading Capital
+
+exceptions: external code (annotated)
+
+const as much as possible
+
+return_type function_name(size_t helpfulName, thing&);
+
+return_type function_name(size_t const internalName, thing& the_thing)
+{
+    // do stuff
+	return something;
+}

@@ -21,5 +21,5 @@ namespace cc
         test* m_next{};
     };
 
-    extern test* gFirstTest;
+    extern test* g_first_test;
 } // namespace cc

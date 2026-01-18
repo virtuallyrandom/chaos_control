@@ -2,11 +2,11 @@
 
 namespace cc
 {
-    extern test* gFirstTest{};
+    extern test* g_first_test{};
 
     test::test()
     {
-        m_next = gFirstTest;
-        gFirstTest = this;
+        m_next = g_first_test;
+        g_first_test = this;
     }
 } // namespace cc

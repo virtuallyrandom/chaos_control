@@ -37,12 +37,6 @@ namespace cc
         // free memory from the current heap. pointer may be nullptr.
         void deallocate(void* ptr) noexcept;
 
-        template <typename Type, class... Args>
-        Type* construct() noexcept;
-
-        template <typename Type>
-        void destroy(Type*);
-
         // determine if the current heap owns the memory. returns true on success,
         // false, otherwise.
         bool owns(void const*, size_t size = {}) const noexcept;
@@ -53,6 +47,9 @@ namespace cc
         // find the child-most allocator that contains this pointer. 
         allocator& find_allocator(void const*) noexcept;
         allocator const& find_allocator(void const*) const noexcept;
+
+        size_t num_allocs() const { return m_allocs; }
+        size_t num_frees() const { return m_frees; }
 
     protected:
         // add a page of memory to the allocator. this is used to

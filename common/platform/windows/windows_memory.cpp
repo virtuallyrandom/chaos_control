@@ -19,7 +19,7 @@ namespace cc
 
     void* root_allocator::internal_reallocate(void* const old, size_t const size, cc::align_val_t const align) noexcept
     {
-        return _aligned_realloc(old, size, static_cast<size_t>(align));
+        return _aligned_realloc(old, size, align.as<size_t>());
     }
 
     size_t root_allocator::internal_size(void const* ptr) const noexcept

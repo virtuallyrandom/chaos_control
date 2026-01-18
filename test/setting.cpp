@@ -2,10 +2,10 @@
 
 #include <utility/setting.h>
 
-class settingTest : public cc::test
+class test_setting : public cc::test
 {
 public:
-    settingTest() = default;
+    test_setting() = default;
 
     virtual cc::string operator()() override
     {

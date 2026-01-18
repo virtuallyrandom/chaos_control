@@ -21,17 +21,17 @@ namespace cc {
 
         virtual void clear();
 
-        [[nodiscard]] bool isEmpty() const;
+        [[nodiscard]] bool empty() const;
 
     protected:
         static constexpr size_t DEFAULT_ALIGNMENT = 16;
 
-        static constexpr size_t required_size(size_t const elementSize, size_t elementCount)
+        static constexpr size_t required_size(size_t const elem_size, size_t elem_count)
         {
             return sizeof(impl) +
-                   freelist_size(elementCount) +
-                   storage_size(elementSize, elementCount) +
-                   element_size(elementCount);
+                   freelist_size(elem_count) +
+                   storage_size(elem_size, elem_count) +
+                   element_size(elem_count);
         }
 
         static constexpr size_t freelist_size(size_t const count)
@@ -39,9 +39,9 @@ namespace cc {
             return align(count * sizeof(atomic<size_t>), DEFAULT_ALIGNMENT);
         }
 
-        static constexpr size_t storage_size(size_t const elementSize, size_t count)
+        static constexpr size_t storage_size(size_t const m_element_size, size_t count)
         {
-            return align(count * elementSize, DEFAULT_ALIGNMENT);
+            return align(count * m_element_size, DEFAULT_ALIGNMENT);
         }
 
         static constexpr size_t element_size(size_t const count)
@@ -49,7 +49,7 @@ namespace cc {
             return align(count * sizeof(atomic<size_t>), DEFAULT_ALIGNMENT);
         }
 
-        queue(size_t const elementSize, size_t const elementCount, void* const buffer, size_t const bufferSize);
+        queue(size_t const element_size, size_t const element_count, void* const buffer, size_t const bufferSize);
 
     private:
         compiler_disable_copymove(queue);
@@ -59,17 +59,17 @@ namespace cc {
 compiler_push_disable_implicit_padding()
 #pragma push_macro("ALIGN")
 #define ALIGN __declspec(align(hardware_destructive_interference_size))
-            ALIGN atomic<size_t>  pushIndex{};
-            ALIGN atomic<size_t>  pushAvail{};
-            ALIGN atomic<size_t>  popIndex{};
-            ALIGN atomic<size_t>  popAvail{};
-            ALIGN atomic<size_t>  freeNext{};
-            ALIGN size_t          elementCount = 0;
-            size_t          elementSize = 0;
-            atomic<size_t>* freeList = nullptr;
-            byte* storage = nullptr;
-            atomic<void*>* elementList = nullptr;
-            bool            isDynamic = false;
+            ALIGN atomic<size_t>  m_push_index{};
+            ALIGN atomic<size_t>  m_push_available{};
+            ALIGN atomic<size_t>  m_pop_index{};
+            ALIGN atomic<size_t>  m_pop_available{};
+            ALIGN atomic<size_t>  m_free_next{};
+            ALIGN size_t          m_element_count = 0;
+            size_t                m_element_size = 0;
+            atomic<size_t>*       m_free_list = nullptr;
+            byte*                 m_storage = nullptr;
+            atomic<void*>*        m_element_list = nullptr;
+            bool                  m_dynamic = false;
 #pragma pop_macro("ALIGN")
 compiler_pop_disable_implicit_padding()
 

@@ -161,6 +161,7 @@
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <ForcedIncludeFiles>$(ProjectDir)precompiled.h</ForcedIncludeFiles>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <DisableSpecificWarnings>4514;4464;4598;5045</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -182,6 +183,7 @@
       <LanguageStandard_C>stdc17</LanguageStandard_C>
       <ForcedIncludeFiles>$(ProjectDir)precompiled.h</ForcedIncludeFiles>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <DisableSpecificWarnings>4514;4464;4598;5045</DisableSpecificWarnings>
     </ClCompile>
     <Link>
       <SubSystem>

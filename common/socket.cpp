@@ -16,7 +16,7 @@ namespace
 {
     struct socket_context
     {
-        int referenceCount{};
+        int reference_count{};
 
         socket_context() = default;
         ~socket_context() = default;
@@ -86,11 +86,11 @@ namespace cc::socket
 
     bool initialize()
     {
-        if (0 == s_ctx.referenceCount++)
+        if (0 == s_ctx.reference_count++)
         {
 #if defined( _WIN32 )
-            WSADATA wsaData;
-            if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0)
+            WSADATA wsa_data;
+            if (WSAStartup(MAKEWORD(2, 2), &wsa_data) != 0)
                 return false;
 #endif // defined( _WIN32 )
         }
@@ -100,10 +100,10 @@ namespace cc::socket
 
     void shutdown()
     {
-        int const oldCount = s_ctx.referenceCount--;
+        int const old_count = s_ctx.reference_count--;
 
         // just went to zero, close out the global context
-        if (oldCount == 1)
+        if (old_count == 1)
         {
 #if defined( _WIN32 )
             WSACleanup();
@@ -120,7 +120,7 @@ namespace cc::socket
 #endif // !defined( _WIN32 )
     }
 
-    size_t get_interfaces(network_interface* const result, size_t const resultCount)
+    size_t get_interfaces(network_interface* const result, size_t const result_count)
     {
         int rv;
 
@@ -138,21 +138,21 @@ namespace cc::socket
             return 0;
         }
 
-        size_t const count = cc::min(size / sizeof(ifaces[0]), resultCount);
+        size_t const count = cc::min(size / sizeof(ifaces[0]), result_count);
         for (size_t i = 0; i < count; i++)
         {
             INTERFACE_INFO& iface = ifaces[i];
 
             network_interface& ri = result[i];
 
-            sockaddr_in* const ifaceAddr = (sockaddr_in*)&iface.iiAddress;
-            inet_ntop(ifaceAddr->sin_family, &ifaceAddr->sin_addr, ri.interface_address, sizeof(ri.interface_address));
+            sockaddr_in* const iface_addr = (sockaddr_in*)&iface.iiAddress;
+            inet_ntop(iface_addr->sin_family, &iface_addr->sin_addr, ri.interface_address, sizeof(ri.interface_address));
 
-            sockaddr_in* const bcastAddr = (sockaddr_in*)&iface.iiBroadcastAddress;
-            inet_ntop(bcastAddr->sin_family, &bcastAddr->sin_addr, ri.broadcast_address, sizeof(ri.broadcast_address));
+            sockaddr_in* const bcast_addr = (sockaddr_in*)&iface.iiBroadcastAddress;
+            inet_ntop(bcast_addr->sin_family, &bcast_addr->sin_addr, ri.broadcast_address, sizeof(ri.broadcast_address));
 
-            sockaddr_in* const netmaskAddr = (sockaddr_in*)&iface.iiNetmask;
-            inet_ntop(netmaskAddr->sin_family, &netmaskAddr->sin_addr, ri.netmask_address, sizeof(ri.netmask_address));
+            sockaddr_in* const netmask_addr = (sockaddr_in*)&iface.iiNetmask;
+            inet_ntop(netmask_addr->sin_family, &netmask_addr->sin_addr, ri.netmask_address, sizeof(ri.netmask_address));
 
             ri.is_up = (iface.iiFlags & IFF_UP) == IFF_UP;
             ri.is_point_to_point = (iface.iiFlags & IFF_POINTTOPOINT) == IFF_POINTTOPOINT;
@@ -166,7 +166,7 @@ namespace cc::socket
         return count;
     }
 
-    socket_type TCPListen(uint16_t const port, cc::socket::network_interface const* const netIface)
+    socket_type TCPListen(uint16_t const port, cc::socket::network_interface const* const net_iface)
     {
         struct addrinfo info;
 
@@ -182,15 +182,15 @@ namespace cc::socket
 /*
         struct addrinfo* result {};
         struct addrinfo hints {};
-        char portName[6];
+        char port_name[6];
         hints.ai_family = AF_INET;
         hints.ai_socktype = SOCK_STREAM;
         hints.ai_protocol = IPPROTO_TCP;
         hints.ai_flags = AI_PASSIVE;
 
-        _snprintf_s(portName, sizeof(portName), "%hu", port);
+        _snprintf_s(port_name, sizeof(port_name), "%hu", port);
 
-        rv = ::getaddrinfo(NULL, portName, &hints, &result);
+        rv = ::getaddrinfo(NULL, port_name, &hints, &result);
         if (rv != 0)
         {
         }
@@ -210,8 +210,8 @@ namespace cc::socket
 
             memset(&addr, 0, sizeof(addr));
             addr.sin_family = AF_INET;
-            if (netIface != nullptr)
-                inet_pton(AF_INET, netIface->interface_address, &addr.sin_addr.s_addr);
+            if (net_iface != nullptr)
+                inet_pton(AF_INET, net_iface->interface_address, &addr.sin_addr.s_addr);
             else
                 addr.sin_addr.s_addr = INADDR_ANY;
             addr.sin_port = htons(port);
@@ -246,31 +246,31 @@ namespace cc::socket
         info.ai_protocol = IPPROTO_TCP;
         info.ai_flags = 0;
 
-        char portStr[6];
+        char port_str[6];
 
-        snprintf(portStr, sizeof(portStr), "%hu", port);
-        portStr[sizeof(portStr) - 1] = 0;
+        snprintf(port_str, sizeof(port_str), "%hu", port);
+        port_str[sizeof(port_str) - 1] = 0;
 
         struct addrinfo* result;
-        int rv = getaddrinfo(address, portStr, &info, &result);
+        int rv = getaddrinfo(address, port_str, &info, &result);
         if (rv != 0)
             return INVALID_SOCKET;
 
         socket_type client = INVALID_SOCKET;
 
-        for (struct addrinfo* resultPtr = result; resultPtr != nullptr; resultPtr = resultPtr->ai_next)
+        for (struct addrinfo* result_ptr = result; result_ptr != nullptr; result_ptr = result_ptr->ai_next)
         {
             struct sockaddr_in addr;
-            if (resultPtr->ai_addrlen == sizeof(addr))
+            if (result_ptr->ai_addrlen == sizeof(addr))
             {
-                client = ::socket(resultPtr->ai_family, resultPtr->ai_socktype, resultPtr->ai_protocol);
+                client = ::socket(result_ptr->ai_family, result_ptr->ai_socktype, result_ptr->ai_protocol);
                 if (client != INVALID_SOCKET)
                 {
                     memset(&addr, 0, sizeof(addr));
-                    memcpy(&addr.sin_addr, &((struct sockaddr_in*)resultPtr->ai_addr)->sin_addr, sizeof(addr.sin_addr));
+                    memcpy(&addr.sin_addr, &((struct sockaddr_in*)result_ptr->ai_addr)->sin_addr, sizeof(addr.sin_addr));
                     addr.sin_port = htons(port);
-                    addr.sin_family = (ADDRESS_FAMILY)resultPtr->ai_family;
-                    rv = connect(client, (struct ::sockaddr*)&addr, (int)resultPtr->ai_addrlen);
+                    addr.sin_family = (ADDRESS_FAMILY)result_ptr->ai_family;
+                    rv = connect(client, (struct ::sockaddr*)&addr, (int)result_ptr->ai_addrlen);
                     if (rv == 0)
                         return client;
                     close(client);
@@ -294,49 +294,49 @@ namespace cc::socket
         return select(&read, 1, &write, 1, &error, 1, timeout);
     }
 
-    size_t select(socket_type* const read, size_t const readCount, socket_type* const write, size_t const writeCount, socket_type* const error, size_t const errorCount, microseconds timeout)
+    size_t select(socket_type* const read, size_t const read_count, socket_type* const write, size_t const write_count, socket_type* const error, size_t const error_count, microseconds timeout)
     {
-        fd_set readSet;
-        fd_set writeSet;
-        fd_set errorSet;
+        fd_set read_set;
+        fd_set write_set;
+        fd_set error_set;
 
-        FD_ZERO(&readSet);
-        FD_ZERO(&writeSet);
-        FD_ZERO(&errorSet);
+        FD_ZERO(&read_set);
+        FD_ZERO(&write_set);
+        FD_ZERO(&error_set);
 
         socket_type hi = 0;
 
-        size_t readUsed{ 0 };
-        for (size_t i = 0; i < readCount; i++)
+        size_t read_used{ 0 };
+        for (size_t i = 0; i < read_count; i++)
         {
             if (read[i] == kInvalidSocket)
                 continue;
-            FD_SET(read[i], &readSet);
+            FD_SET(read[i], &read_set);
             hi = cc::max(hi, read[i]);
-            readUsed++;
+            read_used++;
         }
 
-        size_t writeUsed{ 0 };
-        for (size_t i = 0; i < writeCount; i++)
+        size_t write_used{ 0 };
+        for (size_t i = 0; i < write_count; i++)
         {
             if (write[i] == kInvalidSocket)
                 continue;
-            FD_SET(write[i], &writeSet);
+            FD_SET(write[i], &write_set);
             hi = cc::max(hi, write[i]);
-            writeUsed++;
+            write_used++;
         }
 
-        size_t errorUsed{ 0 };
-        for (size_t i = 0; i < errorCount; i++)
+        size_t error_used{ 0 };
+        for (size_t i = 0; i < error_count; i++)
         {
             if (error[i] == kInvalidSocket)
                 continue;
-            FD_SET(error[i], &errorSet);
+            FD_SET(error[i], &error_set);
             hi = cc::max(hi, error[i]);
-            errorUsed++;
+            error_used++;
         }
 
-        if (readUsed == 0 && writeUsed == 0 && errorUsed == 0)
+        if (read_used == 0 && write_used == 0 && error_used == 0)
             return 0;
 
         seconds const sec = duration_cast<seconds>(timeout);
@@ -345,20 +345,20 @@ namespace cc::socket
         timeval tv;
         tv.tv_sec = truncate_cast<long>(sec.count()) + 1;
         tv.tv_usec = truncate_cast<long>(ms.count());
-        int const rv = ::select(truncate_cast<int>(hi + 1), readUsed ? &readSet : nullptr, writeUsed ? &writeSet : nullptr, errorUsed ? &errorSet : nullptr, &tv);
+        int const rv = ::select(truncate_cast<int>(hi + 1), read_used ? &read_set : nullptr, write_used ? &write_set : nullptr, error_used ? &error_set : nullptr, &tv);
 
         if (rv < 0)
         {
-            int const e = WSAGetLastError();
+            int const e = ::WSAGetLastError();
             (void)e;
             return kInvalidSocket;
         }
         return truncate_cast<socket_type>(rv);
     }
 
-    socket_type accept(socket_type sck, sockaddr* addr, int* addrLen)
+    socket_type accept(socket_type sck, sockaddr* addr, int* addr_len)
     {
-        return ::accept(sck, addr, addrLen);
+        return ::accept(sck, addr, addr_len);
     }
 
     int ioctl(socket_type const s, uint32_t const cmd, uint32_t* const argp)
@@ -480,15 +480,15 @@ namespace cc::socket
         return rv;
     }
 
-    int recvAll(socket_type sck, void* const data, size_t const dataSize, int const flags)
+    int recv_all(socket_type sck, void* const data, size_t const data_size, int const flags)
     {
-        int const maxReadChunkSize = INT32_MAX;
+        int const max_read_chunk_size = INT32_MAX;
 
-        size_t remain = dataSize;
+        size_t remain = data_size;
         char* ptr = reinterpret_cast<char*>(data);
         while (remain != 0)
         {
-            int const count = remain > maxReadChunkSize ? maxReadChunkSize : (int)remain;
+            int const count = remain > max_read_chunk_size ? max_read_chunk_size : (int)remain;
             int const rv = ::recv(sck, ptr, count, flags);
             if (rv <= 0)
             {
@@ -500,17 +500,17 @@ namespace cc::socket
             ptr += rv;
             remain -= rv;
         }
-        return dataSize > INT32_MAX ? INT32_MAX : (int)dataSize;
+        return data_size > INT32_MAX ? INT32_MAX : (int)data_size;
     }
 
-    int sendAll(socket_type sck, void const* const data, size_t const dataSize, int const flags)
+    int send_all(socket_type sck, void const* const data, size_t const data_size, int const flags)
     {
-        int const maxSendChunkSize = INT32_MAX;
-        size_t remain = dataSize;
+        int const max_send_chunk_size = INT32_MAX;
+        size_t remain = data_size;
         char const* ptr = (char const*)data;
         while (remain != 0)
         {
-            int const count = remain > maxSendChunkSize ? maxSendChunkSize : (int)remain;
+            int const count = remain > max_send_chunk_size ? max_send_chunk_size : (int)remain;
             int const rv = ::send(sck, ptr, count, flags);
             if (rv <= 0)
             {
@@ -522,7 +522,7 @@ namespace cc::socket
             ptr += rv;
             remain -= rv;
         }
-        return dataSize > INT32_MAX ? INT32_MAX : (int)dataSize;
+        return data_size > INT32_MAX ? INT32_MAX : (int)data_size;
     }
 
     int recv(socket_type sck, void* const buf, size_t const size, int const flags)
@@ -546,30 +546,30 @@ namespace cc::socket
         // handle both ip4 and ip6
         int radix{ 10 };
 
-        char const* basePtr = base;
-        char const* addrPtr = addr;
+        char const* base_ptr = base;
+        char const* addr_ptr = addr;
         for (size_t index = 0; ; index++)
         {
-            if (*basePtr != '*' && *addrPtr != '*')
+            if (*base_ptr != '*' && *addr_ptr != '*')
             {
                 // todo: detect hex and update radix
 
-                size_t const a = strtoul(basePtr, nullptr, radix);
-                size_t const b = strtoul(addrPtr, nullptr, radix);
+                size_t const a = strtoul(base_ptr, nullptr, radix);
+                size_t const b = strtoul(addr_ptr, nullptr, radix);
                 if ( a != b)
                     return false;
             }
 
-            basePtr = strstr(basePtr, ".");
-            addrPtr = strstr(addrPtr, ".");
+            base_ptr = strstr(base_ptr, ".");
+            addr_ptr = strstr(addr_ptr, ".");
 
-            assert(!!basePtr == !!addrPtr && "Length mismatch");
+            assert(!!base_ptr == !!addr_ptr && "Length mismatch");
 
-            if (basePtr == nullptr && addrPtr == nullptr)
+            if (base_ptr == nullptr && addr_ptr == nullptr)
                 return true;
 
-            basePtr++;
-            addrPtr++;
+            base_ptr++;
+            addr_ptr++;
         }
 
         compiler_unreachable;

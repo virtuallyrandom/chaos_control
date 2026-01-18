@@ -7,32 +7,32 @@
 BUILDMSG_FIXME("this needs to move to a freelist impl and have the queue use that");
 
 namespace cc {
-    queue::queue(size_t const elementSize, size_t const elementCount, void* const buffer, size_t const bufferSize)
+    queue::queue(size_t const elem_size, size_t const elem_count, void* const buffer, size_t const bufferSize)
     {
         assert(buffer != nullptr);
         assert(bufferSize > sizeof(impl));
 
-        assert(bufferSize >= required_size(elementSize, elementCount));
+        assert(bufferSize >= required_size(elem_size, elem_count));
 
         byte* ptr = reinterpret_cast<byte*>(buffer);
 
         me = new (ptr) impl();
         ptr += sizeof(impl);
 
-        me->freeList = reinterpret_cast<atomic<size_t>*>(ptr);
-        ptr += freelist_size(elementCount);
+        me->m_free_list = reinterpret_cast<atomic<size_t>*>(ptr);
+        ptr += freelist_size(elem_count);
 
-        me->storage = ptr;
-        ptr += storage_size(elementSize, elementCount);
+        me->m_storage = ptr;
+        ptr += storage_size(elem_size, elem_count);
 
-        me->elementList = reinterpret_cast<atomic<void*>*>(ptr);
-        ptr += element_size(elementCount);
+        me->m_element_list = reinterpret_cast<atomic<void*>*>(ptr);
+        ptr += element_size(elem_count);
 
-        me->elementCount = elementCount;
-        me->elementSize = elementSize;
+        me->m_element_count = elem_count;
+        me->m_element_size = elem_size;
 
-        for (uint32_t i = 0; i < elementCount; ++i)
-            me->elementList[ i ].store(nullptr);
+        for (uint32_t i = 0; i < elem_count; ++i)
+            me->m_element_list[ i ].store(nullptr);
 
         clear();
     }
@@ -41,21 +41,21 @@ namespace cc {
         if (me == nullptr)
             return nullptr;
 
-        size_t const LOW_MASK = me->elementCount - 1;
-        int const HIGH_SHIFT = countr_zero(me->elementCount) + 1;
-        size_t const INVALID_BIT = size_t(1) << (HIGH_SHIFT - 1);
+        size_t const low_mask = me->m_element_count - 1;
+        int const high_shift = countr_zero(me->m_element_count) + 1;
+        size_t const invalid_bit = size_t(1) << (high_shift - 1);
 
         for (;;)
         {
-            size_t cmp = me->freeNext.load();
-            if (cmp & INVALID_BIT)
+            size_t cmp = me->m_free_next.load();
+            if (cmp & invalid_bit)
                 return nullptr;
-            size_t const cmpIndex = cmp & LOW_MASK;
-            size_t const cmpUID = (size_t)((uint32_t)cmp>> HIGH_SHIFT);
-            size_t const set = ((cmpUID + 1) <<HIGH_SHIFT) | (me->freeList[cmpIndex] & (LOW_MASK | INVALID_BIT));
+            size_t const cmp_index = cmp & low_mask;
+            size_t const cmp_uid = (size_t)((uint32_t)cmp>> high_shift);
+            size_t const set = ((cmp_uid + 1) <<high_shift) | (me->m_free_list[cmp_index] & (low_mask | invalid_bit));
 
-            if (me->freeNext.compare_exchange_weak(cmp, set))
-                return me->storage + cmpIndex * me->elementSize;
+            if (me->m_free_next.compare_exchange_weak(cmp, set))
+                return me->m_storage + cmp_index * me->m_element_size;
         }
     }
 
@@ -69,22 +69,22 @@ namespace cc {
 
         rw_barrier();
 
-        [[maybe_unused]] size_t const was = me->pushAvail--;
+        [[maybe_unused]] size_t const was = me->m_push_available--;
         assert(was > 0);
 
-        size_t const fullIndex = me->pushIndex++;
+        size_t const full_index = me->m_push_index++;
 
         // stall until the previous value is consumed
         for(;;)
         {
-            atomic<void*>& element = me->elementList[fullIndex & (me->elementCount - 1)];
+            atomic<void*>& element = me->m_element_list[full_index & (me->m_element_count - 1)];
             void* tmp = nullptr;
             if (element.compare_exchange_weak(tmp, ptr))
                 break;
         }
 
         // record that data is now available to be consumed
-        me->popAvail++;
+        me->m_pop_available++;
     }
 
     void* queue::read_acquire()
@@ -95,19 +95,19 @@ namespace cc {
         // reserve a count
         for (;;)
         {
-            size_t cmp = me->popAvail;
+            size_t cmp = me->m_pop_available;
             if (cmp == 0)
                 return nullptr;
 
-            if (me->popAvail.compare_exchange_weak(cmp, cmp - 1))
+            if (me->m_pop_available.compare_exchange_weak(cmp, cmp - 1))
                 break;
         }
 
         // get the index
-        size_t const fullIndex = me->popIndex++;
-        size_t const wrapIndex = fullIndex & (me->elementCount - 1);
+        size_t const fullIndex = me->m_pop_index++;
+        size_t const wrap_index = fullIndex & (me->m_element_count - 1);
 
-        atomic<void*>& element = me->elementList[wrapIndex];
+        atomic<void*>& element = me->m_element_list[wrap_index];
         // wait for the object to become valid while also attempting to clear it
         for (;;)
         {
@@ -115,7 +115,7 @@ namespace cc {
             if (ptr != nullptr)
             {
                 // put an available push count
-                me->pushAvail++;
+                me->m_push_available++;
                 return ptr;
             }
         }
@@ -129,23 +129,23 @@ namespace cc {
         if (ptr == nullptr)
             return;
 
-        size_t const LOW_MASK = me->elementCount - 1;
-        int const HIGH_SHIFT = countr_zero(me->elementCount) + 1;
-        size_t const INVALID_BIT = size_t(1) << (HIGH_SHIFT - 1);
+        size_t const low_mask = me->m_element_count - 1;
+        int const high_shift = countr_zero(me->m_element_count) + 1;
+        size_t const invalid_bit = size_t(1) << (high_shift - 1);
 
         // return it to the free list
-        uintptr_t const offset = (uintptr_t)ptr - (uintptr_t)me->storage;
-        size_t const index = size_t{ offset / me->elementSize };
-        assert(index < me->elementCount); // not owned by this queue
+        uintptr_t const offset = (uintptr_t)ptr - (uintptr_t)me->m_storage;
+        size_t const index = size_t{ offset / me->m_element_size };
+        assert(index < me->m_element_count); // not owned by this queue
 
         for (;;)
         {
-            size_t cmp = me->freeNext.load();
-            size_t const cmpIndex = cmp & (LOW_MASK | INVALID_BIT);
-            size_t const cmpUID = (size_t)((uint32_t)cmp >> HIGH_SHIFT);
-            size_t const set = ((cmpUID + 1) << HIGH_SHIFT) | index;
-            me->freeList[index] = cmpIndex;
-            if (me->freeNext.compare_exchange_weak(cmp, set))
+            size_t cmp = me->m_free_next.load();
+            size_t const cmp_index = cmp & (low_mask | invalid_bit);
+            size_t const cmp_uid = (size_t)((uint32_t)cmp >> high_shift);
+            size_t const set = ((cmp_uid + 1) << high_shift) | index;
+            me->m_free_list[index] = cmp_index;
+            if (me->m_free_next.compare_exchange_weak(cmp, set))
                 break;
         }
     }
@@ -155,19 +155,20 @@ namespace cc {
         if (me == nullptr)
             return;
 
-        me->pushIndex = 0;
-        me->popIndex = 0;
-        me->popAvail = 0;
-        me->pushAvail = me->elementCount;
-        me->freeNext = 0;
+        me->m_push_index = 0;
+        me->m_pop_index = 0;
+        me->m_pop_available = 0;
+        me->m_push_available = me->m_element_count;
+        me->m_free_next = 0;
 
-        for (size_t i = 0; i < me->elementCount; ++i)
-            me->freeList[i] = i + 1;
-        me->freeList[me->elementCount - 1] = SIZE_MAX;
+        for (size_t i = 0; i < me->m_element_count; ++i)
+            me->m_free_list[i] = i + 1;
+
+        me->m_free_list[me->m_element_count - 1] = SIZE_MAX;
     }
 
-    bool queue::isEmpty() const
+    bool queue::empty() const
     {
-        return me->popAvail == 0;
+        return me->m_pop_available == 0;
     }
 } // namespace cc

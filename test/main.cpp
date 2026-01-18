@@ -6,7 +6,7 @@
 
 int main()
 {
-    cc::test* test = cc::gFirstTest;
+    cc::test* test = cc::g_first_test;
     while (test)
     {
         cc::string errors = (*test)();

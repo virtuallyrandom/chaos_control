@@ -4,6 +4,7 @@
 #include <memory>
 #include <new>
 
+#include <common/align_val_t.h>
 #include <common/atomic.h>
 #include <common/compiler.h>
 #include <common/mutex.h>
@@ -17,8 +18,6 @@ namespace cc
 
     using std::unique_ptr;
     using std::make_unique;
-
-    using std::align_val_t;
 
     // the object allocator calls new/delete to allocate counts of a type.
     // it is used by containers and is not a general purpose allocator.

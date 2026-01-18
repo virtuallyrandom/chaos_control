@@ -8,6 +8,10 @@ namespace cc
     {
         intmax_t asNum = duration_cast<nanoseconds>(duration).count();
 
+        compiler_push_disable_ctor_deleted();
+        compiler_push_disable_move_assign_deleted();
+        compiler_push_disable_copy_assign_deleted();
+
         struct Step
         {
             intmax_t const period;
@@ -25,6 +29,11 @@ namespace cc
             { microseconds::period::num, "us" },
             { nanoseconds::period::num, "ns" },
         };
+
+        compiler_pop_disable_copy_assign_deleted();
+        compiler_pop_disable_move_assign_deleted();
+        compiler_pop_disable_ctor_deleted();
+
         for (size_t i = 0; i < countof(steps); i++)
         {
             Step const& step = steps[i];

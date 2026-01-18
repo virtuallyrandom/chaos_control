@@ -60,8 +60,8 @@ namespace cc
 
         void flush();
 
-        size_t read(void* const buffer, size_t const bufferSize);
-        size_t write(void const* const buffer, size_t const bufferSize);
+        size_t read(void* const buffer, size_t const buffer_size);
+        size_t write(void const* const buffer, size_t const buffer_size);
 
         template<typename Type, size_t Count>
         size_t read(Type(&buffer)[Count])

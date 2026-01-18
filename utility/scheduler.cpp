@@ -36,7 +36,7 @@ namespace cc
         delete[] reinterpret_cast<byte*>(m_threads);
 
         for (size_t i = 0; i < countof(m_queue); i++)
-            assert(m_queue[i].isEmpty());
+            assert(m_queue[i].empty());
     }
 
     void scheduler::dispatch(genericTask_fn const taskFn,

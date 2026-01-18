@@ -74,6 +74,7 @@
       <Filter>platform</Filter>
     </ClInclude>
     <ClInclude Include="allocator.h" />
+    <ClInclude Include="align_val_t.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="hash.inl" />
@@ -81,5 +82,6 @@
     <None Include="variant.inl" />
     <None Include="memory.inl" />
     <None Include="allocator.inl" />
+    <None Include="align_val_t.inl" />
   </ItemGroup>
 </Project>

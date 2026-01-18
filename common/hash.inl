@@ -5,6 +5,8 @@
 
 namespace
 {
+    // source code based on spooky2 implementation
+
     static constexpr size_t sc_numVars = 12;
     static constexpr size_t sc_blockSize = sc_numVars * 8;
     static constexpr size_t sc_bufSize = 2 * sc_blockSize;
