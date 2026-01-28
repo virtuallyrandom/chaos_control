@@ -85,8 +85,8 @@ VOID WINAPI SvcCtrlHandler(DWORD ctrlCode)
 VOID WINAPI SvcMain(DWORD dwArgc, LPTSTR* lpszArgv)
 {
     HMODULE module{ nullptr };
-    ControlAPI api{};
-    ControlLib* lib{ nullptr };
+    control_api api{};
+    control_lib* lib{ nullptr };
 
     do
     {
@@ -121,7 +121,7 @@ VOID WINAPI SvcMain(DWORD dwArgc, LPTSTR* lpszArgv)
 
         ReportSvcStatus(SERVICE_START_PENDING, NO_ERROR, kWaitHintInMs);
 
-        GetAPIFn getApi;
+        get_api_fn getApi;
         *(void**)&getApi = GetProcAddress(module, kGetAPIName);
         if (nullptr == getApi)
         {

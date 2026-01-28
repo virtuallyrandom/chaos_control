@@ -21,7 +21,7 @@ app::app(int const argc, char const* const* const argv)
     , settings(cc::setting::read(args.get("settings", "app_settings.json")))
     , scheduler()
     , socket_watch(scheduler)
-    , logFile(args.get("log", "app.log"), cc::file_mode::kWrite, cc::file_type::kText)
+    , log_file(args.get("log", "app.log"), cc::file_mode::kWrite, cc::file_type::kText)
     , console(socket_watch)
     , database(console)
 {
@@ -74,6 +74,6 @@ void app::on_log(app* const me, cc::system_clock::time_point tp, Source::Value c
     if (cc::is_debugging())
         OutputDebugStringA(fullMsg);
 
-    me->logFile.write(fullMsg);
-    me->logFile.flush();
+    me->log_file.write(fullMsg);
+    me->log_file.flush();
 }

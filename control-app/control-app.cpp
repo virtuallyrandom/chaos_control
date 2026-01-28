@@ -22,76 +22,76 @@ int CALLBACK WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
     cc::socket::initialize();
 
-    app* theApp = new app(__argc, __argv);
+    app* the_app = new app(__argc, __argv);
 
-    AllocConsole();
+    ::AllocConsole();
 
-    cc::service_manager svc_mgr(theApp->console);
+    cc::service_manager svc_mgr(the_app->console);
 
-    if (theApp->args.has("svc:install"))
+    if (the_app->args.has("svc:install"))
     {
         char path[MAX_PATH + 2];
-        DWORD pathLen = GetModuleFileNameA(nullptr, path + 1, sizeof(path) - 1);
+        DWORD path_len = ::GetModuleFileNameA(nullptr, path + 1, sizeof(path) - 1);
 
         // surround it in quotes
         path[0] = '"';
-        path[++pathLen] = '"';
-        path[++pathLen] = 0;
+        path[++path_len] = '"';
+        path[++path_len] = 0;
 
         // same path as self, just change 'app.exe' to 'svc.exe'
-        const DWORD pathOff = pathLen - 8;
-        assert(strcmp(path + pathOff, "app.exe\"") == 0);
-        memcpy(path + pathOff, "svc", 3);
+        const DWORD path_off = path_len - 8;
+        assert(strcmp(path + path_off, "app.exe\"") == 0);
+        memcpy(path + path_off, "svc", 3);
 
         verify(true, svc_mgr.install(kServiceName, svc_mgr.kAuto, kServiceFriendlyName, kServiceDescription, path));
         return 0;
     }
 
-    if (theApp->args.has("svc:start"))
+    if (the_app->args.has("svc:start"))
     {
         verify(true, svc_mgr.start(kServiceName));
         return 0;
     }
 
-    if (theApp->args.has("svc:stop"))
+    if (the_app->args.has("svc:stop"))
     {
         verify(true, svc_mgr.stop(kServiceName));
         return 0;
     }
 
-    if (theApp->args.has("svc:restart"))
+    if (the_app->args.has("svc:restart"))
     {
         verify(true, svc_mgr.restart(kServiceName));
         return 0;
     }
 
-    if (theApp->args.has("svc:uninstall"))
+    if (the_app->args.has("svc:uninstall"))
     {
         verify(true, svc_mgr.uninstall(kServiceName));
         return 0;
     }
 
-    if (theApp->args.has("svc:disable"))
+    if (the_app->args.has("svc:disable"))
     {
         verify(true, svc_mgr.disable(kServiceName));
         return 0;
     }
 
-    if (theApp->args.has("svc:enable"))
+    if (the_app->args.has("svc:enable"))
     {
         verify(true, svc_mgr.enable(kServiceName));
         return 0;
     }
 
     HMODULE module{};
-    ControlAPI api{};
-    ControlLib* lib{};
-    if (theApp->args.has("svc:simulate"))
+    control_api api{};
+    control_lib* lib{};
+    if (the_app->args.has("svc:simulate"))
     {
         module = LoadLibraryA("control-lib.dll");
         if (nullptr != module)
         {
-            GetAPIFn getApi;
+            get_api_fn getApi;
             *(void**)&getApi = GetProcAddress(module, kGetAPIName);
             if (nullptr != getApi)
             {

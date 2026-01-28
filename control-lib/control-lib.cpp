@@ -46,7 +46,7 @@
 constexpr uint16_t kClientPort = 48094;
 constexpr uint16_t kLocalPort = 48095;
 
-struct ConnectionID { int64_t value{ -1 }; };
+struct connection_id { int64_t value{ -1 }; };
 
 namespace cc
 {
@@ -55,27 +55,27 @@ namespace cc
 
 static void on_crash(void* const)
 {
-    MessageBoxA(NULL, "crashed?\n\nWell, that sucks!", "Oshz...", MB_OK);
-    exit(-1);
+    ::MessageBoxA(NULL, "crashed?\n\nWell, that sucks!", "Oshz...", MB_OK);
+    ::exit(-1);
 }
 
-static void collect_interfaces(cc::socket::network_interface* ifaces, size_t const ifaceCount, const cc::setting& interfaceSettings, cc::set<cc::socket::network_interface*>& result)
+static void collect_interfaces(cc::socket::network_interface* ifaces, size_t const iface_count, const cc::setting& interface_settings, cc::set<cc::socket::network_interface*>& result)
 {
-    for (size_t i = 0; i < ifaceCount; i++)
+    for (size_t i = 0; i < iface_count; i++)
     {
-        for (const cc::pair<const cc::string, cc::setting> pr : interfaceSettings)
+        for (const cc::pair<const cc::string, cc::setting> pr : interface_settings)
         {
             const cc::setting& setting = pr.second;
 
             if (setting.contains("interfaceAddress"))
             {
-                const cc::string& ifaceAddr = setting["interfaceAddress"];
-                if (!cc::socket::is_member(ifaceAddr.c_str(), ifaces[i].interface_address))
+                const cc::string& iface_addr = setting["interfaceAddress"];
+                if (!cc::socket::is_member(iface_addr.c_str(), ifaces[i].interface_address))
                     continue;
             }
 
-            const cc::string& ifaceAddr = setting["interfaceAddress"];
-            if (!cc::socket::is_member(ifaceAddr.c_str(), ifaces[i].interface_address))
+            const cc::string& iface_addr = setting["interfaceAddress"];
+            if (!cc::socket::is_member(iface_addr.c_str(), ifaces[i].interface_address))
                 continue;
 
             result.emplace(&ifaces[i]);
@@ -101,7 +101,7 @@ static void start_listeners(cc::set<cc::socket::network_interface*>& use_interfa
     }
 }
 
-struct ControlLib
+struct control_lib
 {
     cc::utility::crash_handler crash_handler;
     cc::scheduler scheduler;
@@ -110,11 +110,11 @@ struct ControlLib
     uint8_t pad1[8]{};
     cc::console console;
     cc::database database;
-    cc::vector<socket_type> listenerSockets;
-    cc::file logFile;
+    cc::vector<socket_type> listener_sockets;
+    cc::file log_file;
     uint8_t pad2[48]{};
 
-    ControlLib()
+    control_lib()
         : crash_handler("./crash.dmp", on_crash)
         , scheduler()
         , socket_watch(scheduler)
@@ -123,35 +123,35 @@ struct ControlLib
     {
         assert(cc::gContainerTestsPass);
 
-        logFile.open("control.log", cc::file_mode::kWrite, cc::file_type::kText);
-        verify(true, logFile);
+        log_file.open("control.log", cc::file_mode::kWrite, cc::file_type::kText);
+        verify(true, log_file);
 
         console.register_callback(Source::kCount, Level::kCount, on_log, this);
     }
 
 private:
-    static void on_log(ControlLib* const me, cc::system_clock::time_point tp, Source::Value const src, Level::Value const lvl, size_t const msgSize, char const* const msg)
+    static void on_log(control_lib* const me, cc::system_clock::time_point tp, Source::Value const src, Level::Value const lvl, size_t const msgSize, char const* const msg)
     {
-        size_t const fullSize = msgSize + 64;
-        char* const fullMsg = reinterpret_cast<char*>(alloca(fullSize));
+        size_t const full_size = msgSize + 64;
+        char* const full_msg = reinterpret_cast<char*>(alloca(full_size));
 
-        char const* sourceStr{ "Unknown" };
+        char const* source_str{ "Unknown" };
         switch (src)
         {
-            case Source::kApp:      sourceStr = "App";      break;
-            case Source::kCore:     sourceStr = "Core";     break;
-            case Source::kUtility:  sourceStr = "Utility";  break;
-            case Source::kDatabase: sourceStr = "Database"; break;
-            case Source::kCount:    sourceStr = "All";      break;
+            case Source::kApp:      source_str = "App";      break;
+            case Source::kCore:     source_str = "Core";     break;
+            case Source::kUtility:  source_str = "Utility";  break;
+            case Source::kDatabase: source_str = "Database"; break;
+            case Source::kCount:    source_str = "All";      break;
             default: assert(false);
         }
-        constexpr int sourceMaxLen = 4;
+        constexpr int source_max_len = 4;
 
-        char const* levelStr{ "Unknown" };
+        char const* level_str{ "Unknown" };
         constexpr int kLevelMaxLen = 7;
         switch (lvl)
         {
-#define HANDLE_CASE(n) case Level::k##n: static_assert(sizeof(#n) <= kLevelMaxLen + 1, "kLevelMaxLen too small"); levelStr = #n; break;
+#define HANDLE_CASE(n) case Level::k##n: static_assert(sizeof(#n) <= kLevelMaxLen + 1, "kLevelMaxLen too small"); level_str = #n; break;
             HANDLE_CASE(Error);
             HANDLE_CASE(StdErr);
             HANDLE_CASE(Warning);
@@ -160,23 +160,23 @@ private:
             HANDLE_CASE(Info);
             HANDLE_CASE(Debug);
             HANDLE_CASE(Trace);
-            case Level::kCount: levelStr = "All"; break;
+            case Level::kCount: level_str = "All"; break;
             default: assert(false && "unhandled");
 #undef HANDLE_CASE
         }
 
         cc::string dt = cc::format("{}", cc::current_zone()->to_local(tp));
 
-        ::_snprintf_s(fullMsg, fullSize, _TRUNCATE, "%s %- *s %- *s %s\n", dt.c_str(), sourceMaxLen, sourceStr, kLevelMaxLen, levelStr, msg);
+        ::_snprintf_s(full_msg, full_size, _TRUNCATE, "%s %- *s %- *s %s\n", dt.c_str(), source_max_len, source_str, kLevelMaxLen, level_str, msg);
         if (cc::is_debugging())
-            OutputDebugStringA(fullMsg);
+            ::OutputDebugStringA(full_msg);
 
-        me->logFile.write(fullMsg);
-        me->logFile.flush();
+        me->log_file.write(full_msg);
+        me->log_file.flush();
     }
 };
 
-static void on_client_socket(socket_type const sck, ControlLib* const me)
+static void on_client_socket(socket_type const sck, control_lib* const me)
 {
     char msg[512];
 
@@ -196,7 +196,7 @@ static void on_client_socket(socket_type const sck, ControlLib* const me)
     me->console.logf(Source::kApp, Level::kTrace, "sck[%d] recv: %s", sck, msg);
 }
 
-static void on_local_socket(socket_type const sck, ControlLib* const me)
+static void on_local_socket(socket_type const sck, control_lib* const me)
 {
     char msg[512];
 
@@ -216,7 +216,7 @@ static void on_local_socket(socket_type const sck, ControlLib* const me)
     me->console.logf(Source::kApp, Level::kTrace, "sck[%d] recv: %s", sck, msg);
 }
 
-static void on_client_listener(socket_type const sck, ControlLib* const me)
+static void on_client_listener(socket_type const sck, control_lib* const me)
 {
     cc::socket::sockaddr addr;
     int addrlen = sizeof(addr);
@@ -238,7 +238,7 @@ static void on_client_listener(socket_type const sck, ControlLib* const me)
     uint32_t blocking = 0;
     (void)cc::socket::ioctl(sck, cc::socket::kFioNBio, &blocking);
 
-    ConnectionID conid;
+    connection_id conid;
     cc::database::script script = me->database.add("");
     if (false == me->database.exec("INSERT INTO connection (address, port) VALUES (?, ?);", addrStr, kClientPort))
         conid.value = me->database.last_insert_rowid();
@@ -246,7 +246,7 @@ static void on_client_listener(socket_type const sck, ControlLib* const me)
     me->socket_watch.add(client, on_client_socket, me);
 }
 
-static void on_local_listener(socket_type const sck, ControlLib* const me)
+static void on_local_listener(socket_type const sck, control_lib* const me)
 {
     cc::socket::sockaddr addr;
     int addrlen = sizeof(addr);
@@ -268,25 +268,25 @@ static void on_local_listener(socket_type const sck, ControlLib* const me)
     uint32_t blocking = 0;
     (void)cc::socket::ioctl(sck, cc::socket::kFioNBio, &blocking);
 
-    ConnectionID conid;
+    connection_id conid;
     if (SQLITE_OK == me->database.exec("INSERT INTO connection (address, port) VALUES (?, ?);", addrStr, kLocalPort))
         conid.value = me->database.last_insert_rowid();
 
     me->socket_watch.add(client, on_local_socket, me);
 }
 
-ControlLib* ControlCreate(size_t, char const* const*)
+control_lib* control_create(size_t, char const* const*)
 {
     cc::socket::initialize();
 
-    ControlLib* const lib = new ControlLib;
+    control_lib* const lib = new control_lib;
 
     lib->console.logf(Source::kApp, Level::kStatus, "Control initialized");
 
     return lib;
 }
 
-bool ControlDestroy(ControlLib* const lib)
+bool control_destroy(control_lib* const lib)
 {
     if (nullptr == lib)
         return false;
@@ -299,7 +299,7 @@ bool ControlDestroy(ControlLib* const lib)
 
     return true;
 }
-bool ControlStart(ControlLib* const lib)
+bool control_start(control_lib* const lib)
 {
     if (nullptr == lib)
         return false;
@@ -369,7 +369,7 @@ bool ControlStart(ControlLib* const lib)
                        use_interfaces);
     start_listeners(use_interfaces,
                     kClientPort,
-                    lib->listenerSockets,
+                    lib->listener_sockets,
                     lib->socket_watch,
                     (cc::on_wake_callback)on_client_listener,
                     lib);
@@ -383,7 +383,7 @@ bool ControlStart(ControlLib* const lib)
                        use_interfaces);
     start_listeners(use_interfaces,
                     kLocalPort,
-                    lib->listenerSockets,
+                    lib->listener_sockets,
                     lib->socket_watch,
                     (cc::on_wake_callback)on_local_listener,
                     lib);
@@ -393,20 +393,20 @@ bool ControlStart(ControlLib* const lib)
     return true;
 }
 
-bool ControlStop(ControlLib* const lib)
+bool control_stop(control_lib* const lib)
 {
     if (nullptr == lib)
         return false;
 
     lib->console.logf(Source::kApp, Level::kStatus, "Control stopping");
 
-    for (socket_type sck : lib->listenerSockets)
+    for (socket_type sck : lib->listener_sockets)
     {
         lib->socket_watch.remove(sck);
         cc::socket::close(sck);
     }
 
-    lib->listenerSockets.clear();
+    lib->listener_sockets.clear();
     lib->database.close();
 
     lib->console.logf(Source::kApp, Level::kStatus, "Control stopped");
@@ -414,7 +414,7 @@ bool ControlStop(ControlLib* const lib)
     return true;
 }
 
-bool ControlUpdate(ControlLib* const lib)
+bool control_update(control_lib* const lib)
 {
     if (nullptr == lib)
         return false;
@@ -422,11 +422,11 @@ bool ControlUpdate(ControlLib* const lib)
     return true;
 }
 
-extern "C" __declspec(dllexport) void Get(ControlAPI* const api)
+extern "C" __declspec(dllexport) void get_control_api(control_api* const api)
 {
-    api->create = ControlCreate;
-    api->destroy = ControlDestroy;
-    api->start = ControlStart;
-    api->stop = ControlStop;
-    api->update = ControlUpdate;
+    api->create = control_create;
+    api->destroy = control_destroy;
+    api->start = control_start;
+    api->stop = control_stop;
+    api->update = control_update;
 }

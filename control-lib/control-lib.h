@@ -1,15 +1,15 @@
 #pragma once
 
-struct ControlLib;
+struct control_lib;
 
-struct ControlAPI
+struct control_api
 {
-    ControlLib* (*create)(size_t argc, char const* const* argv);
-    bool (*destroy)(ControlLib*);
-    bool (*start)(ControlLib*);
-    bool (*stop)(ControlLib*);
-    bool (*update)(ControlLib*);
+    control_lib* (*create)(size_t argc, char const* const* argv);
+    bool (*destroy)(control_lib*);
+    bool (*start)(control_lib*);
+    bool (*stop)(control_lib*);
+    bool (*update)(control_lib*);
 };
 
-constexpr const char* kGetAPIName = "Get";
-typedef void (*GetAPIFn)(ControlAPI*);
+constexpr const char* kGetAPIName = "get_control_api";
+typedef void (*get_api_fn)(control_api*);

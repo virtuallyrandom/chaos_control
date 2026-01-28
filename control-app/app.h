@@ -16,7 +16,7 @@ struct app
     cc::setting settings;
     cc::scheduler scheduler;
     cc::socket_watch socket_watch;
-    cc::file logFile;
+    cc::file log_file;
     cc::console console;
     cc::database database;
 
