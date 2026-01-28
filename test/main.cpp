@@ -4,6 +4,8 @@
 #include <common/stdio.h>
 #include <common/string.h>
 
+#pragma comment(lib, "common.lib")
+
 int main()
 {
     cc::test* test = cc::g_first_test;

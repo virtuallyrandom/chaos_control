@@ -7,23 +7,34 @@
 namespace cc
 {
     root_allocator::root_allocator()
+        : allocator(nullptr, 0, allocator_root())
     {
-        HANDLE h = ::GetProcessHeap();
-        m_internal = h;
     }
 
     root_allocator::~root_allocator()
     {
-        m_internal = nullptr;
     }
 
     void* root_allocator::internal_reallocate(void* const old, size_t const size, cc::align_val_t const align) noexcept
     {
-        return _aligned_realloc(old, size, align.as<size_t>());
+        if (old)
+            m_used -= _aligned_msize(old, 1, 0);
+
+        void* const ptr = _aligned_realloc(old, size, align.as<size_t>());
+
+        if (nullptr != ptr)
+            m_used += _aligned_msize(ptr, align.as<size_t>(), 0);
+
+        return ptr;
     }
 
     size_t root_allocator::internal_size(void const* ptr) const noexcept
     {
         return _aligned_msize(const_cast<void*>(ptr), 1, 0);
+    }
+
+    size_t root_allocator::internal_used() const noexcept
+    {
+        return m_used;
     }
 } // namespace cc

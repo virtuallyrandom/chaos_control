@@ -14,7 +14,6 @@ namespace cc
     class allocator
     {
     public:
-        allocator();
         virtual ~allocator();
 
         // allocate at least SIZE bytes of memory and copy the contents of the
@@ -44,6 +43,16 @@ namespace cc
         // obtain the usable memory size of the pointer passed.
         size_t size(void const*) const noexcept;
 
+        // obtain the total capacity of the allocator, which is the summation of
+        // all of its pages.
+        size_t capacity() const noexcept;
+
+        // obtain the total used memory of the allocator.
+        size_t used() const noexcept;
+
+        // obtain how many bytes are available in the allocator.
+        size_t available() const noexcept;
+
         // find the child-most allocator that contains this pointer. 
         allocator& find_allocator(void const*) noexcept;
         allocator const& find_allocator(void const*) const noexcept;
@@ -52,37 +61,57 @@ namespace cc
         size_t num_frees() const { return m_frees; }
 
     protected:
-        // add a page of memory to the allocator. this is used to
-        // determine if an block of memory is within the allocator.
-        void add_page(void const*, size_t);
-
-        virtual void* internal_reallocate(void*, size_t size, align_val_t) noexcept = 0;
-        virtual size_t internal_size(void const*) const noexcept = 0;
-
-    private:
         compiler_disable_copymove(allocator);
 
-        struct allocator_page
+        // page information is stored in the page buffer provided when adding a page.
+        // it is stored at the end of the page (aligned) thus:
+        //   [ u s a b l e m e m o r y [page]]
+        // if a page has the flag page::kDynamic, it is owned by the parent allocator.
+        // adding a page does not grant availability of the entire space as
+        // ~sizeof(page) is reserved for management information.
+        // size() may return less than it's actual size due to alignment.
+        struct page
         {
-            uintptr_t head{};
-            uintptr_t tail{};
-            allocator_page* next{};
+            enum flag
+            {
+                kNone = 0,
+                kDynamic = 1 << 0,
+            };
+
+            uintptr_t head{}; // start of usable area
+            uintptr_t tail{}; // end of usable area (+1)
+            uint64_t flags { kNone };
+            page* next{};
         };
+
+        allocator() = delete;
+        allocator(void*, size_t, allocator&);
+        allocator(size_t, align_val_t, allocator&);
+        allocator(size_t, align_val_t);
 
         allocator& find_owning_child(void const*) noexcept;
         allocator const& find_owning_child(void const*) const noexcept;
 
-        mutable shared_timed_mutex m_page_lock;
+        // add a page of memory to the allocator. this is used to
+        // determine if an block of memory is within the allocator.
+        void add_page(page::flag, void*, size_t);
+
+        virtual void* internal_reallocate(void*, size_t size, align_val_t) noexcept = 0;
+        virtual size_t internal_size(void const*) const noexcept = 0;
+        virtual size_t internal_used() const noexcept = 0;
+
         uintptr_t m_page_min{ UINTPTR_MAX };
         uintptr_t m_page_max{};
-        allocator_page* m_pages{};
+        page* m_pages{};
 
         atomic<size_t> m_allocs{};
         atomic<size_t> m_frees{};
-        shared_timed_mutex m_children_lock;
         allocator* m_parent{};
         allocator* m_children{}; // head of child list; iterate next until null
         allocator* m_next{}; // next sibling
+
+        mutable shared_timed_mutex m_page_lock;
+        shared_timed_mutex m_children_lock;
     };
 } // namespace cc
 

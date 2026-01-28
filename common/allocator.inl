@@ -43,4 +43,9 @@ namespace cc
     {
         return internal_size(ptr);
     }
+
+    inline size_t allocator::available() const noexcept
+    {
+        return capacity() - used();
+    }
 } // namespace cc

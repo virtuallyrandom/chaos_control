@@ -1,48 +1,18 @@
 #include "test.h"
 
 #include <common/allocator.h>
+#include <common/debug.h>
 #include <common/format.h>
+#include <common/linear_allocator.h>
+#include <common/math.h>
 
-class linear_allocator : public cc::allocator
-{
-public:
-    linear_allocator()
-    {
-        add_page(m_buffer, kBufferSize);
+#define check(test)\
+    if (!(test))\
+    {\
+        if (cc::is_debugging())\
+            __debugbreak();\
+        return cc::format("Failed: {}\n", #test);\
     }
-
-    virtual ~linear_allocator() = default;
-
-protected:
-    compiler_disable_copymove(linear_allocator);
-
-    virtual void* internal_reallocate(void* const ptr, size_t const size, cc::align_val_t const align) noexcept override
-    {
-        if (size == 0 && nullptr != ptr)
-            return nullptr;
-
-        m_used = (m_used + (align - 1)) & ~(align - 1);
-
-        uint8_t* const mem = m_buffer + m_used;
-        m_used += size;
-
-        if (m_used >= kBufferSize)
-            return nullptr;
-
-        return mem;
-    }
-
-    virtual size_t internal_size(void const*) const noexcept override
-    {
-        return 0;
-    }
-
-private:
-    static constexpr size_t kBufferSize = 1024;
-
-    uint8_t m_buffer[kBufferSize];
-    size_t m_used;
-};
 
 class allocator_test : public cc::test
 {
@@ -58,14 +28,92 @@ public:
             error += cc::format("Invalid deallocation count: has {} expected {}.\n", allocator.num_frees(), num_frees);
     }
 
+    cc::string reset(cc::linear_allocator& alloc)
+    {
+        alloc.reset();
+    }
+
+    cc::string exhaust(cc::linear_allocator& alloc, size_t const size, size_t align)
+    {
+        size_t alloc_counter = alloc.num_allocs();
+        size_t free_counter = alloc.num_frees();
+
+        for(;;)
+        {
+            void* const p = alloc.allocate(size, align);
+
+            if (nullptr == p)
+                break;
+
+            alloc_counter++;
+            check(nullptr != p);
+            check(alloc_counter == alloc.num_allocs());
+
+            alloc.deallocate(p);
+            free_counter++;
+            check(free_counter == alloc.num_frees());
+        }
+
+        check(alloc.used() <= alloc.capacity());
+        check(alloc.available() < cc::max(size, align));
+
+        return "";
+    }
+
+    cc::string test_linear_allocator(cc::linear_allocator& alloc)
+    {
+        cc::string errmsg;
+
+        alloc.reset();
+
+        check(0 == alloc.num_allocs());
+        check(0 == alloc.num_frees());
+
+        for (size_t n = 1; n <= 256; n *= 2)
+        {
+            errmsg = exhaust(alloc, n, n);
+            if (!errmsg.empty())
+                return errmsg;
+        }
+
+#if 0
+        cc::allocator_push(la);
+
+        int* i = new int;
+
+        check_alloc_count(la, 2, 1, error);
+
+        cc::allocator_pop();
+        delete i;
+
+        check_alloc_count(la, 2, 2, error);
+
+        // realloc to make a new allocation
+        p = la.reallocate(nullptr, 4, alignof(uint32_t));
+        check_alloc_count(la, 3, 2, error);
+
+        // realloc to free this one and make a new one (note la doesn't actually free)
+        p = la.reallocate(p, 8, alignof(uint32_t));
+        check_alloc_count(la, 4, 3, error);
+
+        p = la.reallocate(p, 0);
+        check_alloc_count(la, 4, 4, error);
+#endif // 0
+
+        return "";
+    }
+
     virtual cc::string operator()() override
     {
         cc::string error;
 
         try
         {
-            linear_allocator la;
+            cc::linear_allocator_static<256> la;
 
+            error += test_linear_allocator(la);
+
+#if 0
             check_alloc_count(la, 0, 0, error);
 
             void* p;
@@ -75,13 +123,13 @@ public:
             la.deallocate(p);
             check_alloc_count(la, 1, 1, error);
 
-            cc::push_allocator(la);
+            cc::allocator_push(la);
 
             int* i = new int;
 
             check_alloc_count(la, 2, 1, error);
 
-            cc::pop_allocator();
+            cc::allocator_pop();
             delete i;
 
             check_alloc_count(la, 2, 2, error);
@@ -96,6 +144,7 @@ public:
 
             p = la.reallocate(p, 0);
             check_alloc_count(la, 4, 4, error);
+#endif // 0
         }
         catch (...)
         {

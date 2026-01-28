@@ -36,10 +36,10 @@ namespace cc
         void deallocate(T* p, std::size_t);
     };
 
-    void push_allocator(allocator&);
-    void pop_allocator();
-
-    allocator& get_root_allocator();
+    void allocator_push(allocator&);
+    void allocator_pop();
+    allocator& allocator_top();
+    allocator& allocator_root();
 
     allocator& find_allocator(void const*);
 } // namespace cc

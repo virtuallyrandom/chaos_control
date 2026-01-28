@@ -1,6 +1,7 @@
 #pragma once
 
 #include <common/allocator.h>
+#include <common/atomic.h>
 
 namespace cc
 {
@@ -15,7 +16,8 @@ namespace cc
 
         virtual void* internal_reallocate(void*, size_t, align_val_t) noexcept override;
         virtual size_t internal_size(void const*) const noexcept override;
+        virtual size_t internal_used() const noexcept override;
 
-        void* m_internal;
+        atomic<size_t> m_used{};
     };
 } // namespace cc

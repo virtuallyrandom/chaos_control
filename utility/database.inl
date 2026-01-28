@@ -153,7 +153,10 @@ namespace cc
     template <class Arg1, class... Args>
     inline int database::db_bind_generic(sqlite3_stmt* const stmt, int index, cc::database::callback* cb, cc::database::callback_with_param<void*>* cb_with_param, void** cb_param, Arg1 first)
     {
-        return db_bind_generic(stmt, index, cb, cb_with_param, cb_param, first, nullptr);
+        int dberr{ SQLITE_OK };
+        bool const b = db_bind(dberr, stmt, index, cb, cb_with_param, cb_param, first);
+        (void)b;
+        return dberr;
     }
 
     template <class Arg1, class Arg2, class... Args>

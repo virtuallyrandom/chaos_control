@@ -1,3 +1,4 @@
+#include <common/align.h>
 #include <common/allocator.h>
 #include <common/atomic.h>
 #include <common/math.h>
@@ -5,16 +6,62 @@
 
 namespace cc
 {
-    allocator::allocator()
+    allocator::allocator(void* const buffer, size_t const buffer_size, allocator& alloc)
     {
-        if (&get_root_allocator() == this)
+        if (&allocator_root() == this)
             return;
 
-        m_parent = &get_root_allocator().find_allocator(this);
+        assert(nullptr != buffer);
 
-        unique_lock lock(m_parent->m_children_lock);
-        m_next = m_parent->m_children;
-        m_parent->m_children = this;
+        m_parent = &alloc;
+
+        {
+            unique_lock lock(m_parent->m_children_lock);
+            m_next = m_parent->m_children;
+            m_parent->m_children = this;
+        }
+
+        add_page(page::kNone, buffer, buffer_size);
+    }
+
+    allocator::allocator(size_t const buffer_size, align_val_t const align, allocator& alloc)
+    {
+        if (&allocator_root() == this)
+            return;
+
+        assert(0 != buffer_size);
+
+        m_parent = &alloc;
+
+        {
+            unique_lock lock(m_parent->m_children_lock);
+            m_next = m_parent->m_children;
+            m_parent->m_children = this;
+        }
+
+        void* const buffer = m_parent->allocate(buffer_size, align);
+        assert(nullptr != buffer);
+        add_page(page::kDynamic, buffer, buffer_size);
+    }
+
+    allocator::allocator(size_t const buffer_size, align_val_t const align)
+    {
+        if (&allocator_root() == this)
+            return;
+
+        assert(0 != buffer_size);
+
+        m_parent = &allocator_top();
+
+        {
+            unique_lock lock(m_parent->m_children_lock);
+            m_next = m_parent->m_children;
+            m_parent->m_children = this;
+        }
+
+        void* const buffer = m_parent->allocate(buffer_size, align);
+        assert(nullptr != buffer);
+        add_page(page::kDynamic, buffer, buffer_size);
     }
 
     allocator::~allocator()
@@ -42,8 +89,10 @@ namespace cc
 
         while (nullptr != m_pages)
         {
-            allocator_page* const t = m_pages;
+            page* const t = m_pages;
             m_pages = m_pages->next;
+            if ((t->flags & page::kDynamic) && nullptr != m_parent)
+                m_parent->deallocate(reinterpret_cast<void*>(t->head));
             delete t;
         }
 
@@ -63,15 +112,32 @@ namespace cc
             return false;
 
         shared_lock lock(m_page_lock);
-        allocator_page* page = m_pages;
-        while (page)
+        page* pg = m_pages;
+        while (pg)
         {
-            if (head >= page->head && tail <= page->tail)
+            if (head >= pg->head && tail <= pg->tail)
                 return true;
-            page = page->next;
+            pg = pg->next;
         }
 
         return false;
+    }
+
+    size_t allocator::capacity() const noexcept
+    {
+        size_t total{};
+        page const* pg = m_pages;
+        while (nullptr != pg)
+        {
+            total += pg->tail - pg->head;
+            pg = pg->next;
+        }
+        return total;
+    }
+
+    size_t allocator::used() const noexcept
+    {
+        return internal_used();
     }
 
     allocator& allocator::find_allocator(void const* const ptr) noexcept
@@ -102,30 +168,34 @@ namespace cc
         return find_owning_child(ptr);
     }
 
-    void allocator::add_page(void const* const ptr, size_t const length)
+    void allocator::add_page(page::flag const flg, void* const ptr, size_t const buffer_size)
     {
-        allocator_page* const page = new(get_root_allocator()) allocator_page;
-        if (page == nullptr)
+        page* const pg = new (allocator_root()) page;
+        if (nullptr == pg)
+        {
+            assert(nullptr != pg);
             return;
+        }
 
-        page->head = reinterpret_cast<uintptr_t>(ptr);
-        page->tail = page->head + length;
+        pg->head  = reinterpret_cast<uintptr_t>(ptr);
+        pg->tail  = pg->head + buffer_size;
+        pg->flags = flg;
 
         unique_lock lock(m_page_lock);
 
         if (m_pages == nullptr)
-            m_pages = page;
+            m_pages = pg;
         else
         {
-            allocator_page* t = m_pages;
+            page* t = m_pages;
             while (nullptr != t->next)
-                t = page->next;
+                t = pg->next;
 
-            t->next = page;
+            t->next = pg;
         }
 
-        m_page_min = min(m_page_min, page->head);
-        m_page_max = max(m_page_max, page->tail);
+        m_page_min = min(m_page_min, pg->head);
+        m_page_max = max(m_page_max, pg->tail);
     }
 
     allocator& allocator::find_owning_child(void const* const ptr) noexcept
