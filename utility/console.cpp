@@ -61,22 +61,22 @@ namespace cc
     {
         char tmp[256];
         char* msg{ tmp };
-        size_t msgSize{ sizeof(tmp) };
+        size_t msg_size{ sizeof(tmp) };
 
-        int const rv = ::vsnprintf_s(msg, msgSize, _TRUNCATE, fmt, args);
+        int const rv = ::vsnprintf_s(msg, msg_size, _TRUNCATE, fmt, args);
 
         if (rv < 0)
         {
-            int const newSize = ::_vscprintf(fmt, args) + 1;
-            if (newSize < 0)
+            int const new_size = ::_vscprintf(fmt, args) + 1;
+            if (new_size < 0)
                 return;
 
-            msgSize = truncate_cast<size_t>(newSize);
-            msg = reinterpret_cast<char*>(alloca(msgSize + 1));
-            ::vsnprintf_s(msg, msgSize, _TRUNCATE, fmt, args);
+            msg_size = truncate_cast<size_t>(new_size);
+            msg = reinterpret_cast<char*>(alloca(msg_size + 1));
+            ::vsnprintf_s(msg, msg_size, _TRUNCATE, fmt, args);
         }
 
-        distribute(cc::system_clock::now(), src, lvl, msg, msgSize);
+        distribute(cc::system_clock::now(), src, lvl, msg, msg_size);
     }
 
     void console::onStdOut(socket_type const sck, console* const me)
