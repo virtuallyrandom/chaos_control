@@ -6,6 +6,7 @@
 #include <common/format.h>
 #include <common/hash.h>
 #include <common/memory.h>
+#include <common/mutex.h>
 #include <common/socket.h>
 #include <common/time.h>
 #include <common/utility.h>
@@ -112,7 +113,8 @@ struct control_lib
     cc::database database;
     cc::vector<socket_type> listener_sockets;
     cc::file log_file;
-    uint8_t pad2[48]{};
+    cc::shared_timed_mutex log_lock;
+    uint8_t pad2[8]{};
 
     control_lib()
         : crash_handler("./crash.dmp", on_crash)
@@ -169,7 +171,10 @@ private:
 
         ::_snprintf_s(full_msg, full_size, _TRUNCATE, "%s %- *s %- *s %s\n", dt.c_str(), source_max_len, source_str, kLevelMaxLen, level_str, msg);
         if (cc::is_debugging())
+        {
+            cc::unique_lock lock(me->log_lock);
             ::OutputDebugStringA(full_msg);
+        }
 
         me->log_file.write(full_msg);
         me->log_file.flush();

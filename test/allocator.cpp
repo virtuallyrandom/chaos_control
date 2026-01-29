@@ -3,7 +3,7 @@
 #include <common/allocator.h>
 #include <common/debug.h>
 #include <common/format.h>
-#include <common/linear_allocator.h>
+#include <common/allocator_linear.h>
 #include <common/math.h>
 
 #define check(test)\
@@ -28,12 +28,12 @@ public:
             error += cc::format("Invalid deallocation count: has {} expected {}.\n", allocator.num_frees(), num_frees);
     }
 
-    cc::string reset(cc::linear_allocator& alloc)
+    cc::string reset(cc::allocator_linear& alloc)
     {
         alloc.reset();
     }
 
-    cc::string exhaust(cc::linear_allocator& alloc, size_t const size, size_t align)
+    cc::string exhaust(cc::allocator_linear& alloc, size_t const size, size_t align)
     {
         size_t alloc_counter = alloc.num_allocs();
         size_t free_counter = alloc.num_frees();
@@ -60,7 +60,7 @@ public:
         return "";
     }
 
-    cc::string test_linear_allocator(cc::linear_allocator& alloc)
+    cc::string test_linear_allocator(cc::allocator_linear& alloc)
     {
         cc::string errmsg;
 
@@ -109,7 +109,7 @@ public:
 
         try
         {
-            cc::linear_allocator_static<256> la;
+            cc::allocator_linear_static<256> la;
 
             error += test_linear_allocator(la);
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <common/file.h>
+#include <common/mutex.h>
 #include <utility/args.h>
 #include <utility/console.h>
 #include <utility/crash_handler.h>
@@ -17,6 +18,7 @@ struct app
     cc::scheduler scheduler;
     cc::socket_watch socket_watch;
     cc::file log_file;
+    cc::shared_timed_mutex log_lock;
     cc::console console;
     cc::database database;
 

@@ -122,6 +122,7 @@ namespace cc
                 break;
 
             lineBufferUsed += len;
+            lineBuffer[lineBufferUsed] = 0;
 
             // no eol encountered yet so keep buffering
             if (lineBuffer[lineBufferUsed - 1] != '\n')

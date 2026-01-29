@@ -2,6 +2,7 @@
 #include <common/platform/windows.h>
 #include <common/stdlib.h>
 #include <common/thread.h>
+#include <utility/lua.h>
 #include <utility/service.h>
 
 #include "app.h"
@@ -20,11 +21,17 @@ static void on_crash(void* const)
 
 int CALLBACK WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 {
+    ::AllocConsole();
+    {
+        FILE* fh;
+        errno_t e;
+        e = freopen_s(&fh, "CONOUT$", "w", stdout);
+        e = freopen_s(&fh, "CONOUT$", "w", stderr);
+    }
+
     cc::socket::initialize();
 
     app* the_app = new app(__argc, __argv);
-
-    ::AllocConsole();
 
     cc::service_manager svc_mgr(the_app->console);
 

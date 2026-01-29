@@ -25,6 +25,7 @@
     </ClCompile>
     <ClCompile Include="args.cpp" />
     <ClCompile Include="database.cpp" />
+    <ClCompile Include="lua.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="scheduler.h" />
@@ -41,6 +42,7 @@
     <ClInclude Include="service.h" />
     <ClInclude Include="args.h" />
     <ClInclude Include="database.h" />
+    <ClInclude Include="lua.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="setting.inl" />

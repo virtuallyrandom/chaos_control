@@ -27,7 +27,8 @@
       <Filter>platform\windows</Filter>
     </ClCompile>
     <ClCompile Include="allocator.cpp" />
-    <ClCompile Include="linear_allocator.cpp" />
+    <ClCompile Include="allocator_linear.cpp" />
+    <ClCompile Include="allocator_growable.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="platform\windows.h">
@@ -70,13 +71,14 @@
     <ClInclude Include="types.h" />
     <ClInclude Include="utility.h" />
     <ClInclude Include="variant.h" />
-    <ClInclude Include="linear_allocator.h" />
+    <ClInclude Include="allocator_linear.h" />
     <ClInclude Include="platform\platform_memory.h">
       <Filter>platform</Filter>
     </ClInclude>
     <ClInclude Include="allocator.h" />
     <ClInclude Include="align_val_t.h" />
     <ClInclude Include="align.h" />
+    <ClInclude Include="allocator_growable.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="hash.inl" />
@@ -86,6 +88,6 @@
     <None Include="allocator.inl" />
     <None Include="align_val_t.inl" />
     <None Include="align.inl" />
-    <None Include="linear_allocator.inl" />
+    <None Include="allocator_linear.inl" />
   </ItemGroup>
 </Project>

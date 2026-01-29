@@ -24,6 +24,7 @@
     <ClCompile Include="crash_handler.cpp" />
     <ClCompile Include="console.cpp" />
     <ClCompile Include="database.cpp" />
+    <ClCompile Include="lua.cpp" />
     <ClCompile Include="platform\windows\windows_console.cpp" />
     <ClCompile Include="platform\windows\windows_service.cpp" />
     <ClCompile Include="precompiled.cpp">
@@ -41,6 +42,7 @@
     <ClInclude Include="crash_handler.h" />
     <ClInclude Include="console.h" />
     <ClInclude Include="database.h" />
+    <ClInclude Include="lua.h" />
     <ClInclude Include="platform\console.h" />
     <ClInclude Include="precompiled.h" />
     <ClInclude Include="processor_info.h" />

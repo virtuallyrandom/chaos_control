@@ -1,6 +1,7 @@
 #include <fcntl.h>
 #include <io.h>
 
+#include <common/assert.h>
 #include <utility/platform/console.h>
 
 namespace cc::console_platform
@@ -8,6 +9,7 @@ namespace cc::console_platform
     constexpr int kFile = 0;
     constexpr int kSock = 1;
 
+    // possibly revisit: https://stackoverflow.com/questions/311955/redirecting-cout-to-a-console-in-windows
     void redirect(FILE* const from, socket_type const to, int (&info)[2])
     {
         if (kInvalidSocket == to)
@@ -21,9 +23,21 @@ namespace cc::console_platform
         if (info[kSock] != -1)
         {
             info[kFile] = _fileno(from);
-            int dup2Result = _dup2(info[kSock], info[kFile]);
-            if (dup2Result == 0)
-                setvbuf(stdin, NULL, _IONBF, 0);
+
+            // was not associated with an output stream
+            if (-2 == info[kFile])
+            {
+                assert(false && "Console handle not associated with an output stream. Did you AllocConsole and not freopen stdout?");
+                return;
+            }
+
+            int const edup = _dup2(info[kSock], info[kFile]);
+            assert(0 == edup);
+            if (0 == edup)
+            {
+                int const esvb = setvbuf(from, NULL, _IONBF, 0);
+                assert(0 == esvb);
+            }
         }
     }
 
