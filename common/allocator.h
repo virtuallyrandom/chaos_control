@@ -84,7 +84,7 @@ namespace cc
             page* next{};
         };
 
-        allocator() = delete;
+        allocator() = default;
         allocator(void*, size_t, allocator&);
         allocator(size_t, align_val_t, allocator&);
         allocator(size_t, align_val_t);
