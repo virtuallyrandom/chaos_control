@@ -189,7 +189,7 @@ namespace cc
         {
             page* t = m_pages;
             while (nullptr != t->next)
-                t = pg->next;
+                t = t->next;
 
             t->next = pg;
         }
