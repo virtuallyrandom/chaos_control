@@ -159,11 +159,20 @@ void operator delete(void* const ptr) noexcept
     cc::allocator& owner = top.find_allocator(ptr);
     owner.deallocate(ptr);
 }
+void operator delete(void* const ptr, cc::allocator& owner) noexcept
+{
+    owner.deallocate(ptr);
+}
 
 void operator delete(void* const ptr, std::align_val_t const) noexcept
 {
     cc::allocator& top = cc::allocator_top();
     cc::allocator& owner = top.find_allocator(ptr);
+    owner.deallocate(ptr);
+}
+
+void operator delete(void* const ptr, std::align_val_t const, cc::allocator& owner) noexcept
+{
     owner.deallocate(ptr);
 }
 
@@ -174,10 +183,20 @@ void operator delete(void* const ptr, size_t const) noexcept
     owner.deallocate(ptr);
 }
 
+void operator delete(void* const ptr, size_t const, cc::allocator& owner) noexcept
+{
+    owner.deallocate(ptr);
+}
+
 void operator delete(void* const ptr, size_t, std::align_val_t const) noexcept
 {
     cc::allocator& top = cc::allocator_top();
     cc::allocator& owner = top.find_allocator(ptr);
+    owner.deallocate(ptr);
+}
+
+void operator delete(void* const ptr, size_t, std::align_val_t const, cc::allocator& owner) noexcept
+{
     owner.deallocate(ptr);
 }
 
@@ -188,10 +207,20 @@ void operator delete(void* const ptr, std::nothrow_t const&) noexcept
     owner.deallocate(ptr);
 }
 
+void operator delete(void* const ptr, cc::allocator& owner, std::nothrow_t const&) noexcept
+{
+    owner.deallocate(ptr);
+}
+
 void operator delete(void* const ptr, std::align_val_t const, std::nothrow_t const&) noexcept
 {
     cc::allocator& top = cc::allocator_top();
     cc::allocator& owner = top.find_allocator(ptr);
+    owner.deallocate(ptr);
+}
+
+void operator delete(void* const ptr, std::align_val_t const, cc::allocator& owner, std::nothrow_t const&) noexcept
+{
     owner.deallocate(ptr);
 }
 
@@ -202,10 +231,20 @@ void operator delete[](void* const ptr) noexcept
     owner.deallocate(ptr);
 }
 
+void operator delete[](void* const ptr, cc::allocator& owner) noexcept
+{
+    owner.deallocate(ptr);
+}
+
 void operator delete[](void* const ptr, std::align_val_t const) noexcept
 {
     cc::allocator& top = cc::allocator_top();
     cc::allocator& owner = top.find_allocator(ptr);
+    owner.deallocate(ptr);
+}
+
+void operator delete[](void* const ptr, std::align_val_t const, cc::allocator& owner) noexcept
+{
     owner.deallocate(ptr);
 }
 
@@ -216,10 +255,20 @@ void operator delete[](void* const ptr, size_t const) noexcept
     owner.deallocate(ptr);
 }
 
+void operator delete[](void* const ptr, size_t const, cc::allocator& owner) noexcept
+{
+    owner.deallocate(ptr);
+}
+
 void operator delete[](void* const ptr, size_t const, std::align_val_t const) noexcept
 {
     cc::allocator& top = cc::allocator_top();
     cc::allocator& owner = top.find_allocator(ptr);
+    owner.deallocate(ptr);
+}
+
+void operator delete[](void* const ptr, size_t const, std::align_val_t const, cc::allocator& owner) noexcept
+{
     owner.deallocate(ptr);
 }
 
@@ -230,9 +279,19 @@ void operator delete[](void* const ptr, std::nothrow_t const&) noexcept
     owner.deallocate(ptr);
 }
 
+void operator delete[](void* const ptr, cc::allocator& owner, std::nothrow_t const&) noexcept
+{
+    owner.deallocate(ptr);
+}
+
 void operator delete[](void* const ptr, std::align_val_t const, std::nothrow_t const&) noexcept
 {
     cc::allocator& top = cc::allocator_top();
     cc::allocator& owner = top.find_allocator(ptr);
+    owner.deallocate(ptr);
+}
+
+void operator delete[](void* const ptr, std::align_val_t const, cc::allocator& owner, std::nothrow_t const&) noexcept
+{
     owner.deallocate(ptr);
 }

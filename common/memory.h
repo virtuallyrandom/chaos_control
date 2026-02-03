@@ -93,17 +93,29 @@ _VCRT_EXPORT_STD _NODISCARD _Ret_maybenull_ _Success_(return != NULL) _Post_writ
 void* operator new[](size_t count, std::align_val_t, cc::allocator&, const std::nothrow_t&) noexcept;
 
 void operator delete(void* ptr) noexcept;
+void operator delete(void* ptr, cc::allocator&) noexcept;
 void operator delete(void* ptr, std::align_val_t) noexcept;
+void operator delete(void* ptr, std::align_val_t, cc::allocator&) noexcept;
+void operator delete(void* ptr, size_t sz, cc::allocator&) noexcept;
 void operator delete(void* ptr, size_t sz) noexcept;
 void operator delete(void* ptr, size_t sz, std::align_val_t) noexcept;
+void operator delete(void* ptr, size_t sz, std::align_val_t, cc::allocator&) noexcept;
 void operator delete(void* ptr, const std::nothrow_t&) noexcept;
+void operator delete(void* ptr, cc::allocator&, const std::nothrow_t&) noexcept;
 void operator delete(void* ptr, std::align_val_t, const std::nothrow_t&) noexcept;
+void operator delete(void* ptr, std::align_val_t, cc::allocator&, const std::nothrow_t&) noexcept;
 
 void operator delete[](void* ptr) noexcept;
+void operator delete[](void* ptr, cc::allocator&) noexcept;
 void operator delete[](void* ptr, std::align_val_t) noexcept;
+void operator delete[](void* ptr, std::align_val_t, cc::allocator&) noexcept;
 void operator delete[](void* ptr, size_t sz) noexcept;
+void operator delete[](void* ptr, size_t sz, cc::allocator&) noexcept;
 void operator delete[](void* ptr, size_t sz, std::align_val_t) noexcept;
+void operator delete[](void* ptr, size_t sz, std::align_val_t, cc::allocator&) noexcept;
 void operator delete[](void* ptr, const std::nothrow_t&) noexcept;
+void operator delete[](void* ptr, cc::allocator&, const std::nothrow_t&) noexcept;
 void operator delete[](void* ptr, std::align_val_t, const std::nothrow_t&) noexcept;
+void operator delete[](void* ptr, std::align_val_t, cc::allocator&, const std::nothrow_t&) noexcept;
 
 #include <common/memory.inl>
